@@ -1,0 +1,206 @@
+<?php
+
+namespace Easyme\Mvc;
+        
+use Easyme\Util\Flash;
+
+class View extends \Easyme\DI\Injectable{
+    
+    const TEMPLATE_DIR = 'View/template';
+    const PARTIAL_DIR = 'View/shared';
+    
+    /*Raiz de arquivos dessa View*/
+    private $root;
+    
+    /*A View esta desabilitada ?*/
+    private $disabled = false;
+    
+    /*Variaveis dessa View*/
+    private $vars = array();
+    
+    private $template;
+    private $templateVars = array();
+    private $content = array();
+    private $defaultContent;
+    
+    /**
+     * Titulo da pagina
+     * @var string 
+     */
+    private $title;
+    
+    public function reset(){
+//        $this->disabled = false;
+//        $this->vars = array();
+//        $this->content = array();
+//        $this->defaultContent = array();
+//        $this->template = null;
+//        $this->templateVar = array();
+    }
+    
+    public function setRoot($root){
+        $this->root = __DIR__."/../../View". ($root ? "/$root" : "");
+        return $this;
+    }
+
+    public function setTemplate($file,$vars = array()){
+        $this->template = $file;
+        $this->templateVars = $vars;
+        return $this;
+    }
+    
+    public function getTemplate() {
+        return $this->template;
+    }
+    public function setDefaultContent($defaultContent) {
+        $this->defaultContent = $defaultContent;
+    }
+
+    public function setContent($file){
+        if(is_array($file))
+            $this->content = $file;
+        else 
+            $this->content[] = $file;
+        
+        return $this;
+    }
+    
+    public function getContent(){
+        return $this->content;
+    }
+
+    public function run(){
+        
+        /*View esta desabilitada*/
+        if(!$this->template || $this->disabled) return $this->show();
+        
+        $file = __DIR__.'/../../'.self::TEMPLATE_DIR.'/'.$this->template.'.php';
+
+        if(!file_exists($file)){
+            throw new \Exception("Template {$this->template} não encontrado");
+        }else{
+            extract($this->templateVars);
+            include $file;
+        }
+    }
+    
+    public function show(){
+        
+        if( ((!$this->content || sizeof($this->content) < 1) && !$this->defaultContent) || $this->disabled) return;
+        
+        if(!$this->disabled){
+            
+            if($this->content && sizeof($this->content) > 0)
+                $file = array_shift($this->content);
+            else
+                $file = $this->defaultContent;
+
+            if($file){
+                
+                $file = $this->root."/$file.php";
+
+                if(!file_exists($file)){
+                    throw new \Exception("Conteúdo '{$file}' não encontrado");
+                }else{
+                    extract($this->vars);
+                    include $file;
+                }
+            }
+        }
+        
+        
+        return $this;
+    }
+    
+    public function disable(){
+        $this->disabled = true;
+        return $this;
+    }
+    
+    public function enable(){
+        $this->disabled = false;
+        return $this;
+    }
+    
+    public function setVar($key,$value){
+        $this->vars[$key] = $value;
+        return $this;
+    }
+    
+    public function setVars(array $vars){
+        foreach($vars as $key=>$value){
+            $this->setVar($key,$value);
+        }
+        return $this;
+    }
+    
+    public function getTitle() {
+        return $this->title;
+    }
+
+    public function setTitle($title) {
+        $this->title = $title;
+    }
+    
+    public function partial($name,array $vars = array()){
+        
+        $file = __DIR__.'/../../'.self::PARTIAL_DIR.'/'.$name.'.php';
+        
+        if(!file_exists($file)){
+            throw new \Exception("Partial '{$file}' não encontrado");
+        }else{
+            extract($vars);
+            include $file;
+        }
+    }
+    
+    public function addCss($name,$media = 'screen'){
+        echo "<link type='text/css' rel='stylesheet' href='".CSS_DIR."/$name.css' media='$media' />";
+    }
+    
+    public function addJs($name){
+        echo "<script type='text/javascript' charset='utf-8' src='".JS_DIR."/$name.js'></script>";
+    }
+    
+    public function loadCss($name){
+        if(IN_PRODUCTION){
+            
+            $vs = parse_ini_file(VERSIONS,true);
+            $v = $vs['css'] && $vs['css'][$name] ? "?v=".$vs['css'][$name] : '';
+            
+            echo "<link type='text/css' rel='stylesheet' href='".CSS_DIR."/producao/$name.css$v' media='screen' />";
+        }else{
+            
+            $ini = parse_ini_file(CONFIG_DIR.'/css.ini',true);
+
+            if(!array_key_exists($name, $ini))
+                throw new \Exception("Modulo '$name' de CSS nao encontrado");
+
+            foreach($ini[$name] as $file=>$foo){
+                echo "<link type='text/css' rel='stylesheet' href='".CSS_DIR."/$file.css$v' media='screen' />";
+            }
+        }
+    }
+    
+    public function loadJs($name){
+        if(IN_PRODUCTION){
+            
+            $vs = parse_ini_file(VERSIONS,true);
+            $v = $vs['js'] && $vs['js'][$name] ? "?v=".$vs['js'][$name] : '';
+//            $ini = parse_ini_file(CONFIG_DIR.'/js.ini',true);
+//            $version = $ini[$name]['version'];
+            echo "<script type='text/javascript' charset='utf-8' src='".JS_DIR."/producao/$name.js$v'></script>";
+        }else{
+
+            $ini = parse_ini_file(CONFIG_DIR.'/js.ini',true);
+
+            if(!array_key_exists($name, $ini))
+                throw new \Exception('Modulo "$name" de JS nao encontrado');
+            
+            foreach($ini[$name] as $file=>$foo){
+                echo "<script type='text/javascript' charset='utf-8' src='".JS_DIR."/$file.js'></script>";
+            }
+        }
+        
+    }
+}

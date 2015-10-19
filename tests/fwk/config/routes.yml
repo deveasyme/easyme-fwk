@@ -1,0 +1,8 @@
+# routes.yml
+
+route1:
+    path:     /categorias/{id}
+    defaults: { _controller: 'categorias:get' }
+    requirements : 
+        id : \d+
+    methods: [GET]

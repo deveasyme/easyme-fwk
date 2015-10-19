@@ -1,0 +1,32 @@
+{
+    "name": "easyme/easyme-fwk",
+    "description": "Framework baseado em Slim Framework para projetos em 5 camadas",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Easyme Tecnologia e Inovacao Ltda",
+            "email": "comercial@easyme.com.br"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php" : ">=5.4.0",
+        "symfony/symfony" : "2.*",
+        "doctrine/common" : "2.*"
+    },
+    "require-dev" : {
+        "guzzlehttp/guzzle": "~6.0",
+        "phpunit/phpunit": "~4.8"  
+    },
+    "autoload": {
+        "psr-4": {
+            "Easyme\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Easyme\\Test\\": "tests/"
+        }
+    }
+}

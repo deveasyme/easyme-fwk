@@ -29,6 +29,13 @@ class View extends \Easyme\DI\Injectable{
      */
     private $title;
     
+    public function __construct() {
+        parent::__construct();
+        
+        if(!defined('EFWK_APP_DIR'))
+            die("Por favor, defina a constante EFWK_APP_DIR para apontar para a raiz dos arquivos de servidor");
+    }
+    
     public function reset(){
 //        $this->disabled = false;
 //        $this->vars = array();
@@ -39,7 +46,7 @@ class View extends \Easyme\DI\Injectable{
     }
     
     public function setRoot($root){
-        $this->root = __DIR__."/../../View". ($root ? "/$root" : "");
+        $this->root = EFWK_APP_DIR."/View". ($root ? "/$root" : "");
         return $this;
     }
 
@@ -74,7 +81,7 @@ class View extends \Easyme\DI\Injectable{
         /*View esta desabilitada*/
         if(!$this->template || $this->disabled) return $this->show();
         
-        $file = __DIR__.'/../../'.self::TEMPLATE_DIR.'/'.$this->template.'.php';
+        $file = EFWK_APP_DIR.'/'.self::TEMPLATE_DIR.'/'.$this->template.'.php';
 
         if(!file_exists($file)){
             throw new \Exception("Template {$this->template} não encontrado");
@@ -144,7 +151,7 @@ class View extends \Easyme\DI\Injectable{
     
     public function partial($name,array $vars = array()){
         
-        $file = __DIR__.'/../../'.self::PARTIAL_DIR.'/'.$name.'.php';
+        $file = EFWK_APP_DIR.'/'.self::PARTIAL_DIR.'/'.$name.'.php';
         
         if(!file_exists($file)){
             throw new \Exception("Partial '{$file}' não encontrado");

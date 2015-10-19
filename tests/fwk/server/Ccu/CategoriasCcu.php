@@ -2,31 +2,10 @@
 
 namespace Ccu;
 
-class CategoriasCcu extends \Easyme\Mvc\CcuRest implements \Easyme\Mvc\RestInterface{
+class CategoriasCcu extends \Easyme\Mvc\Ccu{
     
-    
-
-    public function deleteAction($id) {
-        
-    }
-
-    public function postAction() {
-        
-    }
-
-    public function putAction($id) {
-        
-    }
-
-    public function getAction($id = null, $query = null) {
-        
-        echo 'GET::' . $id;
-        
-    }
-    
-    public function getFaturasAction($idCartao, $b){
-//        echo "getAll::$userId";/
-        echo $idCartao."<BR>$b";
+    public function indexAction(){
+        $this->apl->teste();
     }
 
 }

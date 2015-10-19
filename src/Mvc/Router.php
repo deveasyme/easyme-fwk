@@ -26,6 +26,11 @@ class Router{
         $ccu = self::$ccu_ph;
         $action = self::$action_ph;
         
+        $this->add("/",[
+            '_ccu' => 'index',
+            '_action' => 'index'
+        ]);
+        
         $this->add("/{_namespace}/{_ccu}/{_action}/{_param}",[],[
             '_namespace' => $namespace,
             '_ccu' => $ccu,
@@ -88,6 +93,8 @@ class Router{
     
     public function getRoute($uri){
         
+        if(!$uri) $uri = '/';
+        
         $rc = new RouteCollection();
         $base_route = new Route('/');
         $rc->add('route', $base_route);
@@ -135,7 +142,7 @@ class Router{
                     return $route;
                 
             }catch(\Exception $ex){
-                
+//                echo $ex->getMessage();
             }
             
         }

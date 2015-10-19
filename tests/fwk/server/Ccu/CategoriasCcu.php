@@ -24,8 +24,9 @@ class CategoriasCcu extends \Easyme\Mvc\CcuRest implements \Easyme\Mvc\RestInter
         
     }
     
-    public function getAllAction($userId){
-        echo "getAll::$userId";
+    public function getFaturasAction($idCartao, $b){
+//        echo "getAll::$userId";/
+        echo $idCartao."<BR>$b";
     }
 
 }

@@ -7,13 +7,15 @@ require_once EFWK_CONFIG_DIR.'/autoloader.php';
 try{
     $di = \Easyme\DI\DefaultDI::getDI();
     
-//    $di->router->setRoutes( EFWK_CONFIG_DIR.'/routes.yml' );
-
     
-    $di->router->add('/categorias/{idCategorias}/faturas/{idFatura}',[
-        '_ccu' => 'categorias',
-        '_action' => 'get'
-    ],[],['GET']);
+//    $di->router->add("/cartoes/{idCartao}/plasticos/{idPlastico}",[
+//        '_ccu' => 'categorias',
+//        '_action' => 'faturas'
+//    ],[ 
+//        'idCartao' => '\d+',
+//        'idPlastico' => '\d+'
+//    ]);
+    
     
     $app = new Easyme\Mvc\Application($di);
     

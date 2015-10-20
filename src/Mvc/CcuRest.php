@@ -35,8 +35,6 @@ abstract class CcuRest extends \Easyme\DI\Injectable{
 //        $action = $method. 'Action';
         
         try{
-            
-            
 //            $data = array();
 //            $id = $this->getParam();
 //            if($id !== null) $data[] = $id;
@@ -47,6 +45,25 @@ abstract class CcuRest extends \Easyme\DI\Injectable{
 //            
             $resp = call_user_method_array($action, $this, $params);
             
+            if($resp){
+                if(!($resp instanceof Response)){
+                    
+                    if($this->request->isGet()){
+                        if(is_array($resp)){
+                            $this->response->setJsonContent(array_map(function(ResourceInterface $resource){
+                                return $resource->toArray();
+                            },$resp));
+                        }else{
+                            $this->response->setJsonContent($resp->toArray());
+                        }
+                    // Pode fazer alguns outros tratamentos pra outros metodos depois
+                    }else{
+                        $this->setResource($resp->toArray());
+                    }
+                    
+                }
+            }
+            
         } catch (\Easyme\Error\ApiException $ex) {
             $this->response->setStatusCode($ex->getCode());
             $this->response->setJsonContent(array(
@@ -56,7 +73,7 @@ abstract class CcuRest extends \Easyme\DI\Injectable{
             ));
         }
         
-        return $resp ? $resp : $this->response;
+        return $this->response;
     }
     
     public function setResource(ResourceInterface $resource){

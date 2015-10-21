@@ -51,7 +51,7 @@ class Logger {
             }
         }
         
-        $this->file =  $this->_basePath.$file_name;
+        $this->file =  LOGS_DIR.'/'.$file_name;
         
         if(!file_exists($this->file)) 
             touch($this->file);

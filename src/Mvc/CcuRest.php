@@ -58,7 +58,8 @@ abstract class CcuRest extends \Easyme\DI\Injectable{
                         }
                     // Pode fazer alguns outros tratamentos pra outros metodos depois
                     }else{
-                        $this->setResource($resp->toArray());
+                        $this->response->setJsonContent($resp->toArray());
+//                        $this->setResource($resp->toArray());
                     }
                     
                 }

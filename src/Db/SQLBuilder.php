@@ -132,6 +132,9 @@ class Statement {
     /*INSERT IGNORE*/
     private $ignore = false;
     
+    /*INSERT REPLACE*/
+    private $replace = false;
+    
     public function __construct($type) {
         $this->type = $type;
     }
@@ -297,6 +300,8 @@ class Statement {
         
         $str = $stat->type;
         
+        if($this->replace) $str = 'REPLACE';
+        
         switch($stat->type){
             case self::SELECT: 
                 $str .= ' ' . implode(",", $stat->selectFields) . ' FROM ' . $stat->table;
@@ -402,6 +407,9 @@ class Statement {
     
     public function setIgnore($ignore) {
         $this->ignore = $ignore;
+    }
+    public function setReplace($replace) {
+        $this->replace = $replace;
     }
 
 
@@ -636,6 +644,14 @@ class SQLBuilder {
      */
     public function ignore($ignore){
         $this->statement->setIgnore($ignore);
+    }
+    
+    /**
+     * 
+     * @param bool $ignore
+     */
+    public function replace($replace){
+        $this->statement->setReplace($replace);
     }
     
     /**

@@ -129,6 +129,9 @@ class Statement {
     /*Se a tabela foi renomeada*/
     private $tableRenamed = false;
     
+    /*INSERT IGNORE*/
+    private $ignore = false;
+    
     public function __construct($type) {
         $this->type = $type;
     }
@@ -322,6 +325,10 @@ class Statement {
                 
             case self::INSERT:
                 
+                if($this->ignore){
+                    $str .= ' IGNORE';
+                }
+                
                 if(!$stat->multipleInsert){
                     
                     $fields = implode(',',array_keys($stat->updateInsertArray));
@@ -392,6 +399,12 @@ class Statement {
     public function setModelsPrefix($prefix){
         $this->modelsPrefix = $prefix;
     }
+    
+    public function setIgnore($ignore) {
+        $this->ignore = $ignore;
+    }
+
+
 }
 
 
@@ -615,6 +628,14 @@ class SQLBuilder {
         
         $this->statement->limit($start,$end);
         return $this;
+    }
+    
+    /**
+     * 
+     * @param bool $ignore
+     */
+    public function ignore($ignore){
+        $this->statement->setIgnore($ignore);
     }
     
     /**

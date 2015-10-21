@@ -8,6 +8,7 @@ try{
     $di = \Easyme\DI\DefaultDI::getDI();
     
     
+    
 //    $di->router->add("/cartoes/{idCartao}/plasticos/{idPlastico}",[
 //        '_ccu' => 'categorias',
 //        '_action' => 'faturas'

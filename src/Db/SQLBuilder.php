@@ -644,6 +644,7 @@ class SQLBuilder {
      */
     public function ignore($ignore){
         $this->statement->setIgnore($ignore);
+        return $this;
     }
     
     /**
@@ -652,6 +653,7 @@ class SQLBuilder {
      */
     public function replace($replace){
         $this->statement->setReplace($replace);
+        return $this;
     }
     
     /**

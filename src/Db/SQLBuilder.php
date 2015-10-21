@@ -135,6 +135,9 @@ class Statement {
     /*INSERT REPLACE*/
     private $replace = false;
     
+    
+    private $onDuplicateKeyUpdateFieldValues = null;
+    
     public function __construct($type) {
         $this->type = $type;
     }
@@ -351,6 +354,15 @@ class Statement {
 
                 $str .= ' INTO ' . $stat->table .' (' .$fields. ') VALUES '. $values;
                 
+                if($this->onDuplicateKeyUpdateFieldValues){
+                    
+                    foreach($this->onDuplicateKeyUpdateFieldValues as $k=>$v)
+                        $updateValues[] = "$k=$v";
+                    
+                    $str .= ' ON DUPLICATE KEY UPDATE ' . implode(',',$updateValues);
+                    
+                }
+                
                 break;
         }
         
@@ -411,6 +423,11 @@ class Statement {
     public function setReplace($replace) {
         $this->replace = $replace;
     }
+
+    public function setOnDuplicateKeyUpdateFieldValues($onDuplicateKeyUpdateFieldValues) {
+        $this->onDuplicateKeyUpdateFieldValues = $onDuplicateKeyUpdateFieldValues;
+    }
+
 
 
 }
@@ -537,6 +554,13 @@ class SQLBuilder {
         $this->statement->setTable($table);
         $this->statement->setUpdateArray($fieldValues);
         
+        return $this;
+    }
+    
+    public function onDuplicateKeyUpdate(array $fieldValues){
+        
+        $this->config = array();
+        $this->statement->setOnDuplicateKeyUpdateFieldValues($fieldValues);
         return $this;
     }
     

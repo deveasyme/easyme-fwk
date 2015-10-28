@@ -26,55 +26,55 @@ class Router{
         $ccu = self::$ccu_ph;
         $action = self::$action_ph;
         
-        $this->add("/",[
+        $this->_add("/",[
             '_ccu' => 'index',
             '_action' => 'index'
         ]);
         
-        $this->add("/{_namespace}/{_ccu}/{_action}/{_param}",[],[
+        $this->_add("/{_namespace}/{_ccu}/{_action}/{_param}",[],[
             '_namespace' => $namespace,
             '_ccu' => $ccu,
             '_action' => $action
         ]);
         
-        $this->add("/{_namespace}/{_ccu}/{_param}",[],[
+        $this->_add("/{_namespace}/{_ccu}/{_param}",[],[
             '_requirements' => $namespace,
             '_ccu' => $ccu
         ]);
-        $this->add("/{_namespace}/{_ccu}",[],[
+        $this->_add("/{_namespace}/{_ccu}",[],[
             '_requirements' => $namespace,
             '_ccu' => $ccu
         ]);
-        $this->add("/{_namespace}",[],[
+        $this->_add("/{_namespace}",[],[
             '_requirements' => $namespace
         ]);
         
         
-        $this->add("/{_ccu}/{_action}/{_param}",[],[
+        $this->_add("/{_ccu}/{_action}/{_param}",[],[
             '_ccu' => $ccu,
             '_action' => $action
         ]);
-        $this->add("/{_ccu}/{_action}",[],[
+        $this->_add("/{_ccu}/{_action}",[],[
             '_ccu' => $ccu,
             '_action' => $action
         ]);
-        $this->add("/{_ccu}/{_param}",[],[
+        $this->_add("/{_ccu}/{_param}",[],[
             '_ccu' => $ccu
         ]);
-        $this->add("/{_ccu}",[],[
+        $this->_add("/{_ccu}",[],[
             '_ccu' => $ccu
         ]);
         
-        $this->add("/{_action}/{_param}",[],[
+        $this->_add("/{_action}/{_param}",[],[
             '_action' => $action
         ]);
         
-        $this->add("/{_action}",[],[
+        $this->_add("/{_action}",[],[
             '_action' => $action
         ]);
     }
     
-    public function add($path,$defaults = array(),$requirements=array(),$methods=array()){
+    private function _add($path,$defaults = array(),$requirements=array(),$methods=array()){
         $this->routes[] = [
             'path' => $path,
             'req' => $requirements,
@@ -82,13 +82,13 @@ class Router{
             'methods' => $methods
         ];
     }
-    
-    public function setRoutes($pathToFile){
-
-        $loader = new YamlFileLoader(new FileLocator());
-        
-        $this->routes = $loader->load($pathToFile);        
-        
+    public function add($path,$defaults = array(),$requirements=array(),$methods=array()){
+        array_unshift($this->routes, [
+            'path' => $path,
+            'req' => $requirements,
+            'def' => $defaults,
+            'methods' => $methods
+        ]);
     }
     
     public function getRoute($uri){

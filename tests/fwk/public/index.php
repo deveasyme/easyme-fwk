@@ -7,7 +7,11 @@ require_once EFWK_CONFIG_DIR.'/autoloader.php';
 try{
     $di = \Easyme\DI\DefaultDI::getDI();
     
-    
+    $di->router->add("/api/categorias/teste",[
+        '_namespace' => 'api',
+        '_ccu' => 'categorias',
+        '_action' => 'teste',
+    ]);
     
 //    $di->router->add("/cartoes/{idCartao}/plasticos/{idPlastico}",[
 //        '_ccu' => 'categorias',

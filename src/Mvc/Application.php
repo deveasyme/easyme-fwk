@@ -2,16 +2,16 @@
 
 namespace Easyme\Mvc;
 
-class Application{
+use Easyme\DI\Injector;
+use Easyme\DI\Injectable;
+
+class Application extends Injectable{
     
     private $onShutDownHandler;
     
-    private $di;
-    
-    public function __construct(\Easyme\DI\Injector $di) {
+    public function __construct() {
         
-        $this->di = $di;
-        
+        // Setando DI para a aplicacao
         $that = $this;
         
         register_shutdown_function(function() use ($that){
@@ -29,9 +29,9 @@ class Application{
     
     public function run(){
         
-        $route = $this->di->router->getRoute($this->di->request->getQuery('_url'));
-        $this->di->dispatcher->addRoute($route);
-        $this->di->dispatcher->start();
+        $route = $this->router->getRoute($this->request->getQuery('_url'));
+        $this->dispatcher->addRoute($route);
+        $this->dispatcher->start();
     }
     
     public function getOnShutDownHandler() {
@@ -41,9 +41,5 @@ class Application{
     public function setOnShutDownHandler($onShutDownHandler) {
         $this->onShutDownHandler = $onShutDownHandler;
     }
-
-
     
 }
-
-?>

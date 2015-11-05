@@ -114,8 +114,6 @@ class Route extends \Easyme\DI\Injectable{
     
     public function run(){
         $this->_assembly();
-        
-        $this->_ccu->_build();
         /*Tenta chamar metodo inicializador da classe*/
         if(method_exists($this->_ccu,'init')) $this->_ccu->init();
         

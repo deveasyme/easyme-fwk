@@ -89,5 +89,3 @@ class Service {
         return $this->value;
     }
 }
-
-?>

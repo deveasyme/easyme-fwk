@@ -2,24 +2,103 @@
 
 namespace Easyme\DI;
 
-class Injectable {
+use Easyme\Mvc\View;
+use Easyme\Mvc\Router;
+use Easyme\Mvc\Dispatcher;
+use Easyme\Db\Database;
+use Easyme\Util\Request;
+use Easyme\Util\Response;
+use Easyme\Util\SessionStorage;
+use Easyme\Util\Logger;
+use Easyme\Util\Flash;
+
+
+/**
+ * @property View $view
+ * @property Router $router
+ * @property Dispatcher $dispatcher
+ * @property Database $db
+ * @property Request $request
+ * @property Response $response
+ * @property Session $session
+ * @property Logger $logger
+ * @property Flash $flash
+ */
+abstract class Injectable {
     
-    protected $di;
+    private static $di;
     
-    public function __construct() {
-        $this->di = Injector::getDefault();
+    public static function setDi(Injector $di){
+        self::$di = $di;
     }
     
     public function __get($name) {
-        return $this->di->get($name);
+        return $this->getDi()->get($name);
     }
     
-    public function setDi(Injector $di){
-        $this->di = $di;
+    /**
+     * @return Injector
+     */
+    public static function create(){
+        
+        $di = new Injector();
+            
+        $di->set('router',function(){
+            $router = new Router();
+            return $router;
+
+        },true);
+
+        $di->set('dispatcher',function(){
+            return new Dispatcher();
+        },true);
+
+        $di->set('view',function(){
+            return new View();
+        },true);
+        $di->set('db',function(){
+            
+            return new Database();
+            
+        },true);
+
+        $di->set('request',function(){
+            $request = new Request();
+            return $request;
+        },true);
+
+        $di->set('response',function(){
+            $response = new Response();
+
+            return $response;
+        },true);
+
+        $di->set('session',function(){
+           return new SessionStorage(); 
+        },true);
+        $di->set('logger',function(){
+            $log = new Logger();
+            return $log;
+        },true);
+
+
+        $di->set('flash',function(){
+            return new Flash();
+        },true);
+        
+        return $di;
+        
     }
     
+    /**
+     * @return Injector
+     */
     public function getDi(){
-        return $this->di;
+
+        if(!self::$di) self::$di = self::create();
+
+        return self::$di;
     }
+
     
 }

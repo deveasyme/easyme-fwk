@@ -8,15 +8,22 @@
 
 namespace Ccu;
 
+use Apl\CategoriasApl;
+
 /**
- * Description of IndexCcu
- *
- * @author Binow
+ * @property CategoriasApl $apl Related apl
  */
-class IndexCcu extends \Easyme\Mvc\Ccu{
+class CategoriasCcu extends \Easyme\Mvc\Ccu{
     
     public function indexAction(){
         $this->view->disable();
+        
+        $this->apl->teste();
+        
+//        $this->view->
+        
+//        $this->apl->teste();
+        
         echo 'Index';
     }
     

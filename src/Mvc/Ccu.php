@@ -1,17 +1,22 @@
 <?php
 namespace Easyme\Mvc;
 
-abstract class Ccu extends \Easyme\DI\Injectable{
+use Exception;
+use Easyme\DI\Injectable;
+
+/**
+ * @property-read Apl $apl Related apl
+ */
+abstract class Ccu extends Injectable{
         
-    protected $apl;
+    private $apl;
     
-    private $_isBuilt;
-    
-    public function _build(){
-        if(!$this->_isBuilt){
+    public function __get($name) {
+        
+        if($name == 'apl'){
             
-            $this->_isBuilt = true;
-            /*Tentando montar a view padrao*/
+            if($this->apl) return $this->apl;
+            
             $ccuName = explode('\\', get_called_class());
 
             /*Removendo o primeiro termo (Ccu\\)*/
@@ -27,9 +32,15 @@ abstract class Ccu extends \Easyme\DI\Injectable{
             $aplName = 'Apl\\'.implode('\\',$ccuName);
             /*Existe Apl com este nome?*/
             if(class_exists($aplName)){
-                $this->apl = new $aplName;
+                return $this->apl = new $aplName;
             }
+            
+            throw new Exception("$aplName does not exists");
+            
         }
+        
+        return parent::__get($name);
     }
+
 
 }

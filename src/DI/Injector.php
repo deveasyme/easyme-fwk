@@ -4,22 +4,15 @@ namespace Easyme\DI;
 
 class Injector {
     
-    private $services;
+    private $services = array();
     
-    private static $default;
-    
-    public function __construct() {
-        $this->services = array();
-        self::$default = $this;
-    }
-    
-    public function __get($name) {
-        return $this->get($name);
-    }
-    
-    public function __set($name, $value) {
-        $this->set($name,$value);
-    }
+//    public function __get($name) {
+//        return $this->get($name);
+//    }
+//    
+//    public function __set($name, $value) {
+//        $this->set($name,$value);
+//    }
     
     public function __call($name, $args) {
         $prefix = substr($name, 0, 3);
@@ -47,14 +40,4 @@ class Injector {
         $this->services[$name] = new Service($name,$definition,$shared);
     }
     
-    public static function getDefault(){
-        return self::$default;
-    }
-    
-    public static function setDefault($di){
-        self::$default = $di;
-    }
-    
 }
-
-?>

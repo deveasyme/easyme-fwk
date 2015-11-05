@@ -30,7 +30,7 @@ class View extends \Easyme\DI\Injectable{
     private $title;
     
     public function __construct() {
-        parent::__construct();
+//        parent::__construct();
         
         if(!defined('EFWK_APP_DIR'))
             die("Por favor, defina a constante EFWK_APP_DIR para apontar para a raiz dos arquivos de servidor");
@@ -159,55 +159,5 @@ class View extends \Easyme\DI\Injectable{
             extract($vars);
             include $file;
         }
-    }
-    
-    public function addCss($name,$media = 'screen'){
-        echo "<link type='text/css' rel='stylesheet' href='".CSS_DIR."/$name.css' media='$media' />";
-    }
-    
-    public function addJs($name){
-        echo "<script type='text/javascript' charset='utf-8' src='".JS_DIR."/$name.js'></script>";
-    }
-    
-    public function loadCss($name){
-        if(IN_PRODUCTION){
-            
-            $vs = parse_ini_file(VERSIONS,true);
-            $v = $vs['css'] && $vs['css'][$name] ? "?v=".$vs['css'][$name] : '';
-            
-            echo "<link type='text/css' rel='stylesheet' href='".CSS_DIR."/producao/$name.css$v' media='screen' />";
-        }else{
-            
-            $ini = parse_ini_file(CONFIG_DIR.'/css.ini',true);
-
-            if(!array_key_exists($name, $ini))
-                throw new \Exception("Modulo '$name' de CSS nao encontrado");
-
-            foreach($ini[$name] as $file=>$foo){
-                echo "<link type='text/css' rel='stylesheet' href='".CSS_DIR."/$file.css$v' media='screen' />";
-            }
-        }
-    }
-    
-    public function loadJs($name){
-        if(IN_PRODUCTION){
-            
-            $vs = parse_ini_file(VERSIONS,true);
-            $v = $vs['js'] && $vs['js'][$name] ? "?v=".$vs['js'][$name] : '';
-//            $ini = parse_ini_file(CONFIG_DIR.'/js.ini',true);
-//            $version = $ini[$name]['version'];
-            echo "<script type='text/javascript' charset='utf-8' src='".JS_DIR."/producao/$name.js$v'></script>";
-        }else{
-
-            $ini = parse_ini_file(CONFIG_DIR.'/js.ini',true);
-
-            if(!array_key_exists($name, $ini))
-                throw new \Exception('Modulo "$name" de JS nao encontrado');
-            
-            foreach($ini[$name] as $file=>$foo){
-                echo "<script type='text/javascript' charset='utf-8' src='".JS_DIR."/$file.js'></script>";
-            }
-        }
-        
     }
 }

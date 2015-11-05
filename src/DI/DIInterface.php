@@ -9,5 +9,3 @@ interface DIInterface {
     public function setDI(Injector $di);
     
 }
-
-?>

@@ -18,18 +18,9 @@ abstract class CcuRest extends \Easyme\DI\Injectable{
 //        return $id;
 //    }
     
-    public function _build() {
-        
-        // TODO: verificar tipo de requisicao de entrada $_SERVER[ACCEPT]
-        
+    public function _dispatch($action,$params){
         
         $this->response->setContentType(Response::CONTENT_TYPE_JSON);
-        
-        
-        
-    }
-    
-    public function _dispatch($action,$params){
         
 //        $method = strtolower($this->request->getMethod()) ;
 //        $action = $method. 'Action';

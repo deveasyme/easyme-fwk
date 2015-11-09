@@ -1,6 +1,7 @@
 <?php
 
-define(EFWK_ROOT_DIR,$_SERVER['DOCUMENT_ROOT']);
+if(!defined(EFWK_ROOT_DIR))
+    define(EFWK_ROOT_DIR,$_SERVER['DOCUMENT_ROOT']);
 
 define(EFWK_VENDOR_DIR,$testing ? __DIR__.'/../vendor' : EFWK_ROOT_DIR.'/vendor');
 

@@ -20,11 +20,12 @@ class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsA
     private $forwardsCount = 0;
     
     private $onExceptionHandler;
+
     
     public function start(){
         
         while(sizeof($this->_routes) > 0){
-            
+        
             $this->_currentRoute = array_shift($this->_routes);
             
             $this->view->reset();
@@ -97,33 +98,20 @@ class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsA
         $this->_routes[] = $route;
     }
 
-    public function forward($config){
+    public function forward($to){
         
         if(++$this->forwardsCount > 10){
             throw new Exception("Possible infinite loop detected.");
         }
         
-//        $route = new Route;
-//        
-//        if(is_array($config)){
-//            
-//            if($config['namespace'])
-//                $route->setNamespace ($config['namespace']);
-//            if($config['ccu'])
-//                $route->setCcu($config['ccu']);
-//            if($config['action'])
-//                $route->setAction($config['action']);
-//            if($config['params'])
-//                $route->setParams($config['params']);
-//            
-//            /*Dispara uma excecao caso nao exista*/
-//            $route->test();
-//
-//        }else{
-//            $route = $this->router->getRoute(url);
-//        }
-//        $this->_forwarded = true;
-//        $this->addRoute($route);
+        if(is_string($to)){
+            
+            $router = new Router();
+            $route = $router->getRoute($to);
+            
+        }
+        $this->_forwarded = true;
+        $this->addRoute($route);
         
     }
     

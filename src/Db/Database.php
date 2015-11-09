@@ -15,25 +15,25 @@ class Database extends EntityManagerDecorator{
 
     public function __construct($conn = null) {
         
-        $config = Setup::createAnnotationMetadataConfiguration([EFWK_MODEL_DIR], false);
-        
+        $config = Setup::createAnnotationMetadataConfiguration([EFWK_MODEL_DIR], !EFWK_IN_PRODUCTION, EFWK_PROXIES_DIR);
+
         parent::__construct(EntityManager::create($conn ?: [
             'driver'   => 'pdo_mysql',
             'user'     => EFWK_DB_USER,
             'password' => EFWK_DB_PASSWORD,
             'dbname'   => EFWK_DB_DATABASE,
-            'host'     => EFWK_DB_HOST
+            'host'     => EFWK_DB_HOST,
+            'charset'  => 'utf8'
         ], $config));
         
     }
     
-//    public function __get($name) {
-//        
-//        if($name == 'query'){
-//            
-//        }
-//        
-//    }
-
+    public function commit(){
+        $this->getConnection()->commit();
+    }
+    public function rollback(){
+        $this->getConnection()->rollback();
+    }
+    
     
 }

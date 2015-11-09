@@ -16,20 +16,9 @@ abstract class Ccu extends Injectable{
         if($name == 'apl'){
             
             if($this->apl) return $this->apl;
+
+            $aplName = preg_replace("/Ccu$/", "Apl", get_called_class());
             
-            $ccuName = explode('\\', get_called_class());
-
-            /*Removendo o primeiro termo (Ccu\\)*/
-            array_shift($ccuName);
-
-            $name = end($ccuName);//[sizeof($ccuName) - 1];
-            /*Nome base da classe. Ex: AdminCcu = Admin*/
-            $name = substr($name,0,strrpos($name,'Ccu'));
-
-            /*Nome base da Apl*/
-            $ccuName[sizeof($ccuName) - 1] = $name.'Apl';
-
-            $aplName = 'Apl\\'.implode('\\',$ccuName);
             /*Existe Apl com este nome?*/
             if(class_exists($aplName)){
                 return $this->apl = new $aplName;

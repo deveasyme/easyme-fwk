@@ -25,15 +25,32 @@ class Injector {
         return array_key_exists($name, $this->services);
     }
     
+    /**
+     * 
+     * @param type $name
+     * @return Service
+     * @throws \Exception
+     */
+    public function getService($name){
+        $service = $this->services[$name];
+        /*Dependencia nao encontrada*/
+        if(is_null($service)) throw new \Exception('Service ' . $name. ' not found');
+        
+        return $service;
+    }
+    
+    
+    /**
+     * 
+     * @param type $name
+     * @return Service
+     * @throws \Exception
+     */
     public function get($name){
         $args = func_get_args();
         /*Nome do servico*/
         array_shift($args);
-        $service = $this->services[$name];
-        /*Dependencia nao encontrada*/
-        if(is_null($service)) throw new \Exception('Service ' . $name. ' not found');
-        /*Resolve o servico*/
-        return $service->resolve($args);
+        return $this->getService($name)->resolve($args);
     }
     
     public function set($name,$definition,$shared = false){

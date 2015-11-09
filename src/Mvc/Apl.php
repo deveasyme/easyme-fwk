@@ -17,18 +17,13 @@ abstract class Apl extends \Easyme\DI\Injectable{
             
             if($this->dao) return $this->dao;
             
-            $aplName = get_class($this);
+            $daoName = preg_replace("/Apl$/", "Dao", get_called_class());
 
-            /*Removendo o Apl do inicio*/
-            $aplName = substr_replace($aplName, 'Dao', -3);
-            /*Removendo o Apl do final*/
-            $aplName = substr_replace($aplName, 'Dao', 0, 3);
-
-            if(class_exists($aplName)){
-                return $this->dao = new $aplName;
+            if(class_exists($daoName)){
+                return $this->dao = new $daoName;
             }
             
-            throw new Exception("$aplName does not exists");
+            throw new Exception("$daoName does not exists");
             
         }
         

@@ -35,7 +35,11 @@ class Response {
     private $expires;
     
     public function __construct() {
-        $this->setContentType(self::CONTENT_TYPE_TEXT_HTML);
+        
+        if($this->expectsHtml())
+            $this->setContentType(self::CONTENT_TYPE_TEXT_HTML);
+        else if($this->expectsJson())
+            $this->setContentType(self::CONTENT_TYPE_JSON);
     }
 
 
@@ -133,5 +137,21 @@ class Response {
         return $this;
     }
     
+
+    /**
+     * Se a requisicao espera como retorno html
+     * @return boolean
+     */
+    public function expectsHtml(){
+        return strpos($_SERVER['HTTP_ACCEPT'], self::CONTENT_TYPE_TEXT_HTML ) !== FALSE;
+    }
+    
+    /**
+     * Se a requisicao espera como retorno json
+     * @return boolean
+     */
+    public function expectsJson(){
+        return strpos($_SERVER['HTTP_ACCEPT'], self::CONTENT_TYPE_JSON ) !== FALSE;
+    }
     
 }

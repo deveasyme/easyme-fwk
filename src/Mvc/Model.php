@@ -4,7 +4,11 @@ namespace Easyme\Mvc;
 use Easyme\Util\SessionStorage as Store;
 use Easyme\DI\Injectable;
 
-class Model extends Injectable{
+abstract class Model extends Injectable{
+    
+    public static function entityName(){
+        return get_called_class();
+    }
 
     public static function loadFromStore(){
         /*Nome completo da classe que chamou o metodo*/

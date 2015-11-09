@@ -2,6 +2,12 @@
 
 namespace Easyme\Mvc;
 
+use Easyme\Util\Response;
+use Exception;
+use Easyme\Mvc\ResourceInterface;
+use Easyme\Mvc\Router\Route;
+
+
 class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsAwareInterface{
     
     private $_eventManager;
@@ -11,37 +17,57 @@ class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsA
     private $_routes;
     private $_currentRoute;
     
+    private $forwardsCount = 0;
+    
+    private $onExceptionHandler;
+    
     public function start(){
         
         while(sizeof($this->_routes) > 0){
             
             $this->_currentRoute = array_shift($this->_routes);
             
-            
             $this->view->reset();
 
-            $this->view->setRoot($this->_currentRoute->getCcuName());
-            $this->view->setDefaultContent($this->_currentRoute->getAction());
             /*Executa o controlador associado a rota*/
             $this->_forwarded = false;
-            $resp = $this->_currentRoute->run();
             
-            if(!$this->_forwarded){
+            try {
                 
-                $hasResp = $resp instanceof \Easyme\Util\Response;
-                if( $hasResp ) $this->response = $resp;
+                $resp = $this->_currentRoute->run();
+            
+                if(!$this->_forwarded){ 
+                    
+                    if($resp instanceof ResourceInterface){
+                        $this->response->setJsonContent($resp->toArray());
+                    }
+                    else if(is_array($resp)){
 
-                $this->response->sendHeaders();
+                        if($resp[0] instanceof ResourceInterface){
+                            $this->response->setJsonContent(array_map(function(ResourceInterface $resource){
+                                return $resource->toArray();
+                            }, $resp));
+                        }else{
+                            $this->response->setJsonContent($resp);
+                        }
 
-                if( !$hasResp ){
-                    $this->view->run();
+                    }
+                    
+                    if(!$this->view->isDisabled()){
+                        $this->response->setContent($this->view->run());
+                    }
+
                 }
-
-                //Executo views associadas
-                $this->response->sendContent();
+                
+            } catch (Exception $ex) {
+                
+                if(is_callable($this->onExceptionHandler)){
+                    call_user_func($this->onExceptionHandler, $ex);
+                }else{
+                    throw $ex;
+                }
+                
             }
-            
-            
             
         }
     }
@@ -59,34 +85,50 @@ class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsA
         return $this->_currentRoute->getParams();
     }
     
-    public function addRoute(Router\Route $route){
+    /**
+     * 
+     * @return Route
+     */
+    public function getRoute(){
+        return $this->_currentRoute;
+    }
+    
+    public function addRoute(Route $route){
         $this->_routes[] = $route;
     }
 
     public function forward($config){
         
-        $route = new Router\Route;
-        
-        if(is_array($config)){
-            
-            if($config['namespace'])
-                $route->setNamespace ($config['namespace']);
-            if($config['ccu'])
-                $route->setCcuName($config['ccu']);
-            if($config['action'])
-                $route->setAction($config['action']);
-            if($config['params'])
-                $route->setParams($config['params']);
-            
-            /*Dispara uma excecao caso nao exista*/
-            $route->test();
-
-        }else{
-            $route = $this->router->getRoute(url);
+        if(++$this->forwardsCount > 10){
+            throw new Exception("Possible infinite loop detected.");
         }
-        $this->_forwarded = true;
-        $this->addRoute($route);
         
+//        $route = new Route;
+//        
+//        if(is_array($config)){
+//            
+//            if($config['namespace'])
+//                $route->setNamespace ($config['namespace']);
+//            if($config['ccu'])
+//                $route->setCcu($config['ccu']);
+//            if($config['action'])
+//                $route->setAction($config['action']);
+//            if($config['params'])
+//                $route->setParams($config['params']);
+//            
+//            /*Dispara uma excecao caso nao exista*/
+//            $route->test();
+//
+//        }else{
+//            $route = $this->router->getRoute(url);
+//        }
+//        $this->_forwarded = true;
+//        $this->addRoute($route);
+        
+    }
+    
+    public function onException($callable){
+        $this->onExceptionHandler = $callable;
     }
     
     public function getEventManager() {

@@ -9,7 +9,11 @@ class Application extends Injectable{
     
     private $onShutDownHandler;
     
+    private $router;
+    
     public function __construct() {
+        
+        $this->router = new Router();
         
         // Setando DI para a aplicacao
         $that = $this;
@@ -27,11 +31,21 @@ class Application extends Injectable{
         
     }
     
+    /**
+     * Executa a rota 
+     */
     public function run(){
-        
         $route = $this->router->getRoute($this->request->getQuery('_url'));
         $this->dispatcher->addRoute($route);
         $this->dispatcher->start();
+    }
+    
+    /**
+     * Imprime as saidas (cabecalho + corpo) 
+     */
+    public function flush(){
+        $this->response->sendHeaders();
+        $this->response->sendContent();
     }
     
     public function getOnShutDownHandler() {

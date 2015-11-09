@@ -3,120 +3,104 @@
 namespace Easyme\Mvc;
         
 use Easyme\Util\Flash;
+use Exception;
+use \Easyme\DI\Injectable;
 
-class View extends \Easyme\DI\Injectable{
+class View extends Injectable{
     
-    const TEMPLATE_DIR = 'View/template';
-    const PARTIAL_DIR = 'View/shared';
+    private static $TEMPLATE_DIR = '_templates';
+    private static $PARTIALS_DIR = '_partials';
     
-    /*Raiz de arquivos dessa View*/
-    private $root;
-    
-    /*A View esta desabilitada ?*/
-    private $disabled = false;
-    
-    /*Variaveis dessa View*/
     private $vars = array();
     
+    private $stack = [];
     private $template;
-    private $templateVars = array();
-    private $content = array();
-    private $defaultContent;
     
-    /**
-     * Titulo da pagina
-     * @var string 
-     */
-    private $title;
+    private $fresh = true;
+    private $disabled = true;
     
-    public function __construct() {
-//        parent::__construct();
-        
-        if(!defined('EFWK_APP_DIR'))
-            die("Por favor, defina a constante EFWK_APP_DIR para apontar para a raiz dos arquivos de servidor");
-    }
+//    private
     
     public function reset(){
-//        $this->disabled = false;
-//        $this->vars = array();
-//        $this->content = array();
-//        $this->defaultContent = array();
-//        $this->template = null;
-//        $this->templateVar = array();
+        $this->fresh = true;
+        $this->disabled = true;
+        $this->stack = [];
     }
     
-    public function setRoot($root){
-        $this->root = EFWK_APP_DIR."/View". ($root ? "/$root" : "");
-        return $this;
-    }
-
-    public function setTemplate($file,$vars = array()){
-        $this->template = $file;
-        $this->templateVars = $vars;
-        return $this;
-    }
-    
-    public function getTemplate() {
-        return $this->template;
-    }
-    public function setDefaultContent($defaultContent) {
-        $this->defaultContent = $defaultContent;
-    }
-
-    public function setContent($file){
-        if(is_array($file))
-            $this->content = $file;
-        else 
-            $this->content[] = $file;
+    public function setTemplate($filename){
+        
+        $path = EFWK_APP_DIR.'/'.self::$TEMPLATE_DIR.'/'.$filename.'.php';
+        
+        if(!file_exists($path)){
+            throw new Exception("Template $filename not found");
+        }
+        
+        if($this->fresh) $this->disabled = false;
+        $this->fresh = false;
+        $this->template = $path;
         
         return $this;
     }
     
-    public function getContent(){
-        return $this->content;
+    public function setContent($filename){
+        
+        $path = EFWK_APP_DIR.'/'.$this->dispatcher->getRoute()->getCcuPath().'/'.$filename.'.php';
+        
+        if(!file_exists($path)){
+            throw new Exception("Content $filename not found");
+        }
+        
+        if($this->fresh) $this->disabled = false;
+        $this->fresh = false;
+        $this->stack[] = $path;
+        
+        return $this;
     }
-
+    
+    public function isDisabled(){
+        return $this->disabled;
+    }
+    
+    /**
+     * 
+     * @return boolean
+     */
     public function run(){
         
-        /*View esta desabilitada*/
-        if(!$this->template || $this->disabled) return $this->show();
+        ob_start();
         
-        $file = EFWK_APP_DIR.'/'.self::TEMPLATE_DIR.'/'.$this->template.'.php';
-
-        if(!file_exists($file)){
-            throw new \Exception("Template {$this->template} não encontrado");
+        extract($this->vars);
+        
+        if($this->template){
+            include $this->template;
         }else{
-            extract($this->templateVars);
-            include $file;
+            $this->show();
         }
+        return ob_get_clean();
     }
     
+    /**
+     * [Deve ser chamado apenas de dentro de uma View]
+     * Exibe o conteudo da proxima view na pilha
+     */
     public function show(){
+//        print_r($this->stack);
+        include array_shift($this->stack);
+    }
+    
+    /**
+     * [Deve ser chamado apenas de dentro de uma View]
+     * Exibe o conteudo de um partial
+     */
+    public function partial($name,array $vars = array()){
         
-        if( ((!$this->content || sizeof($this->content) < 1) && !$this->defaultContent) || $this->disabled) return;
+        $file = EFWK_APP_DIR.'/'.self::$PARTIALS_DIR.'/'.$name.'.php';
         
-        if(!$this->disabled){
-            
-            if($this->content && sizeof($this->content) > 0)
-                $file = array_shift($this->content);
-            else
-                $file = $this->defaultContent;
-
-            if($file){
-                
-                $file = $this->root."/$file.php";
-
-                if(!file_exists($file)){
-                    throw new \Exception("Conteúdo '{$file}' não encontrado");
-                }else{
-                    extract($this->vars);
-                    include $file;
-                }
-            }
-        }
+        if(!file_exists($file))
+            throw new Exception("Partial {$name} not found");
         
-        
-        return $this;
+        extract($vars);
+        include $file;
     }
     
     public function disable(){
@@ -141,23 +125,4 @@ class View extends \Easyme\DI\Injectable{
         return $this;
     }
     
-    public function getTitle() {
-        return $this->title;
-    }
-
-    public function setTitle($title) {
-        $this->title = $title;
-    }
-    
-    public function partial($name,array $vars = array()){
-        
-        $file = EFWK_APP_DIR.'/'.self::PARTIAL_DIR.'/'.$name.'.php';
-        
-        if(!file_exists($file)){
-            throw new \Exception("Partial '{$file}' não encontrado");
-        }else{
-            extract($vars);
-            include $file;
-        }
-    }
 }

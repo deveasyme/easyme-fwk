@@ -7,173 +7,82 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Route;
+use Easyme\Mvc\Router\Route;
+
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+
+use Exception;
 
 class Router{
     
-    
-    
-    private static $namespace_ph = "([a-zA-Z0-9_-]+)";
-    private static $ccu_ph = "([a-zA-Z0-9_-]+)";
-    private static $action_ph = "([a-zA-Z0-9_]+)";
-    
-    private $routes;
-    
-    public function __construct() {
-        
-        $namespace = self::$namespace_ph;
-        $ccu = self::$ccu_ph;
-        $action = self::$action_ph;
-        
-        $this->_add("/",[
-            '_ccu' => 'index',
-            '_action' => 'index'
-        ]);
-        
-        $this->_add("/{_namespace}/{_ccu}/{_action}/{_param}",[],[
-            '_namespace' => $namespace,
-            '_ccu' => $ccu,
-            '_action' => $action
-        ]);
-        
-        $this->_add("/{_namespace}/{_ccu}/{_param}",[],[
-            '_requirements' => $namespace,
-            '_ccu' => $ccu
-        ]);
-        $this->_add("/{_namespace}/{_ccu}",[],[
-            '_requirements' => $namespace,
-            '_ccu' => $ccu
-        ]);
-        $this->_add("/{_namespace}",[],[
-            '_requirements' => $namespace
-        ]);
-        
-        
-        $this->_add("/{_ccu}/{_action}/{_param}",[],[
-            '_ccu' => $ccu,
-            '_action' => $action
-        ]);
-        $this->_add("/{_ccu}/{_action}",[],[
-            '_ccu' => $ccu,
-            '_action' => $action
-        ]);
-        $this->_add("/{_ccu}/{_param}",[],[
-            '_ccu' => $ccu
-        ]);
-        $this->_add("/{_ccu}",[],[
-            '_ccu' => $ccu
-        ]);
-        
-        $this->_add("/{_action}/{_param}",[],[
-            '_action' => $action
-        ]);
-        
-        $this->_add("/{_action}",[],[
-            '_action' => $action
-        ]);
-    }
-    
-    private function _add($path,$defaults = array(),$requirements=array(),$methods=array()){
-        $this->routes[] = [
-            'path' => $path,
-            'req' => $requirements,
-            'def' => $defaults,
-            'methods' => $methods
-        ];
-    }
-    public function add($path,$defaults = array(),$requirements=array(),$methods=array()){
-        array_unshift($this->routes, [
-            'path' => $path,
-            'req' => $requirements,
-            'def' => $defaults,
-            'methods' => $methods
-        ]);
-    }
-    
+    /**
+     * 
+     * @param string $uri
+     * @return \Easyme\Mvc\Router\Route|boolean
+     * @throws \Easyme\Error\NotFoundException
+     */
     public function getRoute($uri){
         
         if(!$uri) $uri = '/';
         
-        $rc = new RouteCollection();
-        $base_route = new Route('/');
-        $rc->add('route', $base_route);
-        $context = new RequestContext("/");
+        $parts = $uri == '/' ? [''] : explode('/', $uri);
         
-        $matcher = new UrlMatcher($rc, $context);
+        $path = "";
+        $searchDirs = [];
+        foreach($parts as $i=>$part){
+            
+            $part = $i > 0 ? "$path/$part" : "";
+            
+            if(is_dir(EFWK_APP_DIR.$part) && file_exists(EFWK_APP_DIR.$part.'/routes.yml')){
+                array_unshift($searchDirs, [
+                    'path' => EFWK_APP_DIR.$part,
+                    'namespace' => $part
+                ]);
+            }
+            $path .= $part;
+        }
+        
+        $context = new RequestContext();
+        $context->fromRequest(SymfonyRequest::createFromGlobals());
+        
+        foreach($searchDirs as $dir){
 
-        
-        foreach($this->routes as $_route){
-            
-            $base_route->setPath($_route['path']);
-            $base_route->setDefaults($_route['def']);
-            $base_route->setRequirements($_route['req']);
-            $base_route->setMethods($_route['methods']);
-            
-            $route = new Router\Route();
-            
             try{
                 
-                $route_config = $matcher->match($uri);
+                $locator = new FileLocator($dir['path']);
+                $loader = new YamlFileLoader($locator);
+                $collection = $loader->load('routes.yml');
+
+                $matcher = new UrlMatcher($collection, $context);
+
+                $parameters = $matcher->match($uri);
                 
-//                print_r($route_config); echo '<BR>';
+                $route = new Route();
                 
-                if(array_key_exists('_namespace', $route_config)){
-                    $route->setNamespace($route_config['_namespace']);
-                }
-                if(array_key_exists('_ccu', $route_config)){
-                    $route->setCcuName($route_config['_ccu']);
-                }
-                if(array_key_exists('_action', $route_config)){
-                    $route->setAction($route_config['_action']);
+                $ccu = explode(":", $parameters['_ccu']);
+                
+                // A ultima posicao do array eh sempre o metodo a ser executado
+                $route->setAction(array_pop($ccu));
+                // A proxima, eh sempre o nome da ccu
+                $route->setCcu(array_pop($ccu));
+                
+                $route->setNamespace(  $dir['namespace'] . '/' . implode('/', $ccu) );
+                
+                foreach($parameters as $k=>$v){
+                    if($k[0] != '_'){
+                        $route->setParam($k,$v);
+                    }
                 }
                 
-                $params = array();
-                if(array_key_exists('_param', $route_config)){
-                    $params[] = $route_config['_param'];
-                }
-                foreach($route_config as $k=>$v){
-                    if($k[0] == '_') continue;
-                        $params[] = $v;
-                }
-                $route->setParams($params);
+                return $route;
                 
-                if($route->exists())
-                    return $route;
-                
-            }catch(\Exception $ex){
-//                echo $ex->getMessage();
+            } catch (Exception $ex) {
+                // Sem saida..
             }
             
         }
         
-        throw new \Easyme\Error\NotFoundException("Route for $uri not found");
-        
-        
-//        $ccu = explode(":", $route_config["_controller"]);
-//        
-//        $route = new Router\Route();
-//        $route->setCcuName($ccu[sizeof($ccu) - 2]);
-//        $route->setAction($ccu[sizeof($ccu) - 1]);
-//        if(sizeof($ccu) > 1){
-//            $ns = array();
-//            for($i = 0 ; $i < sizeof($ccu) - 2 ; $i++){
-//                $ns[] = $ccu[$i];
-//            } 
-//            $ns = implode("\\", $ns);
-//            $route->setNamespace($ns);
-//        }
-//        
-//        $params = array();
-//        foreach($route_config as $k=>$v){
-//            //Ignorando valores default
-//            if($k[0]=="_") continue;
-//            $params[] = $v;
-//        }
-//        
-//        $route->setParams($params);
-//        
-//        return $route;
+         throw new \Easyme\Error\NotFoundException("Route for $uri not found");
         
     }
     

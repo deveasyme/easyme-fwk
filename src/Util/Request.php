@@ -41,7 +41,7 @@ class Request {
         return $this->rawBody;
     }
     public function getJsonRawBody($associative = true){
-        return $this->isContentType("application/json") ? json_decode( $this->rawBody ,$associative) : array();
+        return $this->expectsJson() ? json_decode( $this->rawBody ,$associative) : array();
     }
     
     
@@ -54,18 +54,16 @@ class Request {
         }
     }
 
-    
-    
-    public function get($key = null,$filter = null,$defaultValue = null){
+    public function get($key = null,$defaultValue = null,$filter = null){
         return $key ? $this->_get($_REQUEST,$key,$filter,$defaultValue) : $_REQUEST;
     }
-    public function getQuery($key = null,$filter = null,$defaultValue = null){
+    public function getQuery($key = null,$defaultValue = null,$filter = null){
         return $key ? $this->_get($this->getData,$key,$filter,$defaultValue) : $this->getData;
     }
-    public function getPost($key = null,$filter = null,$defaultValue = null){
+    public function getPost($key = null,$defaultValue = null,$filter = null){
         return $key ? $this->_get($this->postData,$key,$filter,$defaultValue) : $this->postData;
     }
-    public function getPut($key = null,$filter = null,$defaultValue = null){
+    public function getPut($key = null,$defaultValue = null,$filter = null){
         return $key ? $this->_get($this->putData,$key,$filter,$defaultValue) : $this->putData;
     }
     
@@ -101,66 +99,20 @@ class Request {
     public function isDelete(){
         return $this->isMethod('DELETE');
     }
-    
-    public function isAjax(){
-        return !empty($this->server['HTTP_X_REQUESTED_WITH']) && strtolower($this->server['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+ 
+    /**
+     * Se a requisicao espera como retorno html
+     * @return boolean
+     */
+    public function expectsHtml(){
+        return strpos($_SERVER['HTTP_ACCEPT'], 'text/html' ) !== FALSE;
     }
     
-    public function __toString() {
-        return print_r($this->request,true);
-    }
-    
-    public function getUri($removeQuery = false){
-        return $removeQuery ? preg_replace('/\/?(\?.*)?$/', '', $this->server["REQUEST_URI"]) : $this->server["REQUEST_URI"];
-                            
-    }
-    public function from(){
-        return $this->server["HTTP_REFERER"];
-    }
-    
-    
-    public function fail($msg,$extraData = array()){
-        http_response_code ( 400 );
-        echo json_encode(array(
-            'text' => $msg,
-            'data' => $extraData
-        ));
-    }
-    
-    public function notFound(){
-        http_response_code ( 404 );
-    }
-    
-    /*FILES HANDLE*/
-    
-    public function hasFiles(){
-        return sizeof($this->files) > 0;
-    }
-    
-    public function getFiles(){
-        $files = array();
-        foreach($_FILES as $_FILE){
-            $files[] = new Request\File($_FILE);
-        }
-        return $files;
-    }
-    
-    public function getFile($key){
-        return $_FILES[$key] ? new Request\File($_FILES[$key]) : null;
-    }
-    
-    public function getContentType(){
-        return $this->server['CONTENT_TYPE'];
-    }
-    
-    public function isContentType($type){
-        return strpos($this->getContentType(), $type) !== false;
-    }
-    
-    public function getServerName(){
-        return $this->server['SERVER_NAME'];
-    }
-    public function getPort(){
-        return $this->server['SERVER_PORT'];
+    /**
+     * Se a requisicao espera como retorno json
+     * @return boolean
+     */
+    public function expectsJson(){
+        return strpos($_SERVER['HTTP_ACCEPT'], 'application/json' ) !== FALSE;
     }
 }

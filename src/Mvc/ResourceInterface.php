@@ -17,6 +17,14 @@ interface ResourceInterface {
     
     public function getId();
     
+    /**
+     * @return array Representacao do objeto em forma de array
+     */
     public function toArray();
+    
+    /**
+     * @param array $objArr Atualiza um objeto apartir de um array
+     */
+    public function fromArray(array $objArr);
     
 }

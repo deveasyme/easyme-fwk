@@ -3,7 +3,6 @@
 namespace Easyme\DI;
 
 use Easyme\Mvc\View;
-use Easyme\Mvc\Router;
 use Easyme\Mvc\Dispatcher;
 use Easyme\Db\Database;
 use Easyme\Util\Request;
@@ -15,7 +14,6 @@ use Easyme\Util\Flash;
 
 /**
  * @property View $view
- * @property Router $router
  * @property Dispatcher $dispatcher
  * @property Database $db
  * @property Request $request
@@ -36,18 +34,22 @@ abstract class Injectable {
         return $this->getDi()->get($name);
     }
     
+    public function __set($name,$definition) {
+        $di = $this->getDi();
+        
+        $shared = false;
+        if($di->has($name)){
+            $shared = $di->getService($name)->getIsShared();
+        }
+        return $di->set($name, $definition, $shared);
+    }
+    
     /**
      * @return Injector
      */
     public static function create(){
         
         $di = new Injector();
-            
-        $di->set('router',function(){
-            $router = new Router();
-            return $router;
-
-        },true);
 
         $di->set('dispatcher',function(){
             return new Dispatcher();

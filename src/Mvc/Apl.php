@@ -3,6 +3,7 @@
 namespace Easyme\Mvc;
 
 use Easyme\Mvc\Dao;
+use Exception;
 
 /**
  * @property Dao $dao 

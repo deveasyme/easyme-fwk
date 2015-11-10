@@ -99,6 +99,10 @@ class Request {
     public function isDelete(){
         return $this->isMethod('DELETE');
     }
+    
+    public function getReferer(){
+        return $_SERVER['HTTP_REFERER'];
+    }
  
     /**
      * Se a requisicao espera como retorno html

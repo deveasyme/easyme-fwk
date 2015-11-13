@@ -10,6 +10,7 @@ use Easyme\Util\Response;
 use Easyme\Util\SessionStorage;
 use Easyme\Util\Logger;
 use Easyme\Util\Flash;
+use Easyme\Util\Date;
 
 
 /**
@@ -18,9 +19,10 @@ use Easyme\Util\Flash;
  * @property Database $db
  * @property Request $request
  * @property Response $response
- * @property Session $session
+ * @property SessionStorage $session
  * @property Logger $logger
  * @property Flash $flash
+ * @property Date $date
  */
 abstract class Injectable {
     
@@ -86,6 +88,10 @@ abstract class Injectable {
 
         $di->set('flash',function(){
             return new Flash();
+        },true);
+        
+        $di->set('date',function(){
+            return new Date();
         },true);
         
         return $di;

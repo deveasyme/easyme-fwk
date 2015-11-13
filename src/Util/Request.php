@@ -41,7 +41,7 @@ class Request {
         return $this->rawBody;
     }
     public function getJsonRawBody($associative = true){
-        return $this->expectsJson() ? json_decode( $this->rawBody ,$associative) : array();
+        return $this->expectsJson() && $this->rawBody ? json_decode( $this->rawBody ,$associative) : array();
     }
     
     
@@ -104,6 +104,10 @@ class Request {
         return $_SERVER['HTTP_REFERER'];
     }
  
+    public function getIp(){
+        return $_SERVER['REMOTE_ADDR'];
+    }
+    
     /**
      * Se a requisicao espera como retorno html
      * @return boolean

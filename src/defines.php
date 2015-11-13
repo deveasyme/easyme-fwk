@@ -21,7 +21,7 @@ $ini = parse_ini_file(EFWK_CONFIG_DIR.'/app.ini',true);
 define(EFWK_IN_PRODUCTION,!!$ini['Info']['production']);
 
 $db = parse_ini_file(EFWK_CONFIG_DIR.'/database.ini',true);
-$key = EFWK_IN_PRODUCTION ? 'production' : 'development';
+$key = $testing ? 'test' : (EFWK_IN_PRODUCTION ? 'production' : 'development');
 define(EFWK_DB_HOST, $db[$key]['host']);
 define(EFWK_DB_USER, $db[$key]['user']);
 define(EFWK_DB_PASSWORD, $db[$key]['password']);

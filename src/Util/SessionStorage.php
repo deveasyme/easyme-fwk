@@ -27,6 +27,10 @@ class SessionStorage {
         }
     }
     
+    public function getContents(){
+        return $_SESSION[$this->key];
+    }
+    
     public function __set($key,$value){
         
 //        error_log("{$this->key} => $key => $value");
@@ -64,5 +68,3 @@ class SessionStorage {
     
     
 }
-
-?>

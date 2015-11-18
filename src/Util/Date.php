@@ -1,6 +1,8 @@
 <?php
 namespace Easyme\Util;
 
+use DateTime;
+
 class Date{
     
     /*
@@ -150,5 +152,10 @@ class Date{
     {
         return date("Y-m-d H:i:s");
     }
+  
     
+    public function format($date, $extended = false){
+        $date = new DateTime($date);
+        return $date->format($extended ? 'Y-m-d H:i:s' : 'Y-m-d');
+    }
 }

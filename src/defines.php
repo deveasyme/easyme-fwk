@@ -3,7 +3,7 @@
 if(!defined(EFWK_ROOT_DIR))
     define(EFWK_ROOT_DIR,$_SERVER['DOCUMENT_ROOT']);
 
-define(EFWK_VENDOR_DIR,$testing ? __DIR__.'/../vendor' : EFWK_ROOT_DIR.'/vendor');
+define(EFWK_VENDOR_DIR, EFWK_ROOT_DIR.'/vendor');
 
 define(EFWK_CONFIG_DIR,EFWK_ROOT_DIR.'/config');
 

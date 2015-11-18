@@ -49,6 +49,13 @@ abstract class Injectable {
     /**
      * @return Injector
      */
+    public static function getInstance(){
+        return self::$di ?: self::create();
+    }
+    
+    /**
+     * @return Injector
+     */
     public static function create(){
         
         $di = new Injector();

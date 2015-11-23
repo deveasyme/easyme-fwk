@@ -22,9 +22,4 @@ interface ResourceInterface {
      */
     public function toArray();
     
-    /**
-     * @param array $objArr Atualiza um objeto apartir de um array
-     */
-    public function fromArray(array $objArr);
-    
 }

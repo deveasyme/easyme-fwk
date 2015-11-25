@@ -6,6 +6,7 @@ use Easyme\Util\Response;
 use Exception;
 use Easyme\Mvc\ResourceInterface;
 use Easyme\Mvc\Router\Route;
+use Easyme\Db\Paginator;
 
 
 class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsAwareInterface{
@@ -45,13 +46,26 @@ class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsA
                     else if(is_array($resp)){
 
                         if($resp[0] instanceof ResourceInterface){
-                            $this->response->setJsonContent(array_map(function(ResourceInterface $resource){
-                                return $resource->toArray();
-                            }, $resp));
+                            
+                            $this->response->setJsonContent([
+                                'total' => sizeof($resp),
+                                'itens' => array_map(function(ResourceInterface $resource){
+                                    return $resource->toArray();
+                                }, $resp)
+                            ]);
+                            
                         }else{
                             $this->response->setJsonContent($resp);
                         }
-
+                    }else if($resp instanceof Paginator){
+                        $itens = [];
+                        foreach($resp as $r){
+                            $itens[] = $r->toArray();
+                        }
+                        $this->response->setJsonContent([
+                            'total' => sizeof($resp),
+                            'itens' => $itens
+                        ]);
                     }
                     
                     if(!$this->view->isDisabled()){

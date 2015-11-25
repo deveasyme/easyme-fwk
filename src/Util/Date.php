@@ -1,8 +1,6 @@
 <?php
 namespace Easyme\Util;
 
-use DateTime;
-
 class Date{
     
     /*
@@ -45,7 +43,7 @@ class Date{
             {
                     if($date)
                     {
-                            $aux = date($mask,strtotime(date_string_interval($quant*(-1),$interval),strtotime($date)));
+                            $aux = date($mask,strtotime($this->date_string_interval($quant*(-1),$interval),strtotime($date)));
 
                             if( ($interval == "MONTH" || $interval == "YEAR") && strlen($date) >= 10 && ( substr($date,8,2) != substr($aux,8,2) ) )
                             {
@@ -74,7 +72,7 @@ class Date{
             {
                     if($date)
                     {
-                            $aux = date($mask,strtotime(date_string_interval($quant,$interval),strtotime($date)));
+                            $aux = date($mask,strtotime($this->date_string_interval($quant,$interval),strtotime($date)));
 
                             if( ($interval == "MONTH" || $interval == "YEAR") && strlen($date) >= 10 && ( substr($date,8,2) != substr($aux,8,2) ) )
                             {
@@ -152,10 +150,5 @@ class Date{
     {
         return date("Y-m-d H:i:s");
     }
-  
     
-    public function format($date, $extended = false){
-        $date = new DateTime($date);
-        return $date->format($extended ? 'Y-m-d H:i:s' : 'Y-m-d');
-    }
 }

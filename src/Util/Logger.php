@@ -12,8 +12,12 @@ class Logger {
      */
     private $file;
     
-    public function __construct() {
-        
+    private $flags = 0;
+    
+    public function __construct($append = true) {
+        if($append)
+            $this->flags = FILE_APPEND;
+           
     }
     
     public function log($fileName , $data){
@@ -36,7 +40,7 @@ class Logger {
         
         $fileName .= '.log';
         $this->createFile($fileName);
-        file_put_contents(EFWK_LOGS_DIR.'/'.$fileName,print_r($log,true),FILE_APPEND);   
+        file_put_contents(EFWK_LOGS_DIR.'/'.$fileName,print_r($log,true),$this->flags);   
     }
     
     private function createFile($file_name){

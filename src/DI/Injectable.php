@@ -22,7 +22,6 @@ use Easyme\Util\Date;
  * @property SessionStorage $session
  * @property Logger $logger
  * @property Flash $flash
- * @property Date $date
  */
 abstract class Injectable {
     
@@ -95,10 +94,6 @@ abstract class Injectable {
 
         $di->set('flash',function(){
             return new Flash();
-        },true);
-        
-        $di->set('date',function(){
-            return new Date();
         },true);
         
         return $di;

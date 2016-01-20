@@ -6,12 +6,17 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 
 use Doctrine\ORM\Decorator\EntityManagerDecorator;
+use Doctrine\Common\Proxy\AbstractProxyFactory;
 
 class Database extends EntityManagerDecorator{
 
     public function __construct($conn = null) {
         
-        $config = Setup::createAnnotationMetadataConfiguration([EFWK_MODEL_DIR], !EFWK_IN_PRODUCTION, EFWK_PROXIES_DIR);
+        $config = Setup::createAnnotationMetadataConfiguration([], !EFWK_IN_PRODUCTION, EFWK_PROXIES_DIR);
+        
+        if(EFWK_IN_PRODUCTION){
+            $config->setAutoGenerateProxyClasses(AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS);
+        }
         
         $default = [
             'driver'   => 'pdo_mysql',

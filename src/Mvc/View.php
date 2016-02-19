@@ -43,8 +43,14 @@ class View extends Injectable{
     }
     
     public function setContent($filename){
+        // Caminhos relativos
+        if($filename[0] == '/'){
+            $path = EFWK_PUBLIC_DIR.'/'.$filename;
+        }else{
+            
+            $path = EFWK_APP_DIR.'/'.$this->dispatcher->getRoute()->getCcuPath().'/'.$filename.'.php';
+        }
         
-        $path = EFWK_APP_DIR.'/'.$this->dispatcher->getRoute()->getCcuPath().'/'.$filename.'.php';
         
         if(!file_exists($path)){
             throw new Exception("Content $filename not found");

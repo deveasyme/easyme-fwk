@@ -4,7 +4,22 @@ namespace Easyme\Util;
 
 class Sanitizer {
     
-    public function sanitize($value,$filter){
+    const BOOLEAN = 'boolean';
+    const EMAIL = 'email';
+    const ENCODED = 'encoded';
+    const MAGIC_QUOTES = 'magic_quotes';
+    const FLOAT = 'float';
+    const INT = 'int';
+    const SPECIAL_CHARS = 'special_chars';
+    const FULL_SPECIAL_CHARS = 'full_special_chars';
+    const STRING = 'string';
+    const STRIPPED = 'stripped';
+    const URL = 'url';
+    const UNSAFE_RAW = 'unsafe_raw';
+    const TRIM = 'trim';
+    const JSON = 'json';
+
+        public function sanitize($value,$filter){
         switch($filter){
             
             case "boolean": return filter_var($value,FILTER_VALIDATE_BOOLEAN);
@@ -35,5 +50,3 @@ class Sanitizer {
     }
     
 }
-
-?>

@@ -29,17 +29,21 @@ class Router{
         
         $path = "";
         $searchDirs = [];
+
         foreach($parts as $i=>$part){
             
-            $part = $i > 0 ? "$path/$part" : "";
             
-            if(is_dir(EFWK_APP_DIR.$part) && file_exists(EFWK_APP_DIR.$part.'/routes.yml')){
+            $relPath = $i > 0 ? "$path/$part" : "";
+            $absPath = EFWK_APP_DIR . $relPath;
+            
+            if(is_dir($absPath) && file_exists($absPath.'/routes.yml')){
+                
                 array_unshift($searchDirs, [
-                    'path' => EFWK_APP_DIR.$part,
-                    'namespace' => $part
+                    'path' => $absPath,
+                    'namespace' => $relPath
                 ]);
             }
-            $path .= $part;
+            $path .= $i > 0 ? "/$part" : $part;
         }
         
         $context = new RequestContext();

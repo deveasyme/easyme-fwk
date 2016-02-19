@@ -6,6 +6,7 @@ class Request {
     
     private $server;
     private $request;
+    private $cookies;
     private $sanitizer;
     
     private $files;
@@ -19,6 +20,7 @@ class Request {
     public function __construct() {
         $this->server = $_SERVER;
         $this->request = $_REQUEST;
+        $this->cookies = $_COOKIE;
         $this->files = $_FILES;
         $this->sanitizer = new Sanitizer();
         
@@ -46,16 +48,26 @@ class Request {
     
     
     private function _get($ar,$key,$filter = null,$defaultValue = null){
-        if($ar[$key] !== NULL && $ar[$key] !== ''){
+
+        if(array_key_exists($key, $ar)){
             if($filter !== null) return $this->sanitizer->sanitize($ar[$key],$filter);
             return $ar[$key];
-        }else if($defaultValue && !array_key_exists($key, $ar)){
-            return $defaultValue;
         }
+        
+        return $defaultValue;
     }
 
     public function get($key = null,$defaultValue = null,$filter = null){
-        return $key ? $this->_get($_REQUEST,$key,$filter,$defaultValue) : $_REQUEST;
+        
+        if($this->isGet()){
+            return $this->getQuery($key , $defaultValue , $filter);
+        }
+        if($this->isPost()){
+            return $this->getPost($key , $defaultValue , $filter);
+        }
+        if($this->isPut()){
+            return $this->getPut($key , $defaultValue , $filter);
+        }
     }
     public function getQuery($key = null,$defaultValue = null,$filter = null){
         return $key ? $this->_get($this->getData,$key,$filter,$defaultValue) : $this->getData;
@@ -101,11 +113,21 @@ class Request {
     }
     
     public function getReferer(){
-        return $_SERVER['HTTP_REFERER'];
+        return $this->server['HTTP_REFERER'];
     }
  
     public function getIp(){
-        return $_SERVER['REMOTE_ADDR'];
+        return $this->server['REMOTE_ADDR'];
+    }
+    
+    public function getHeader($header){
+        $headers = apache_request_headers();
+        return $headers[$header];
+    }
+    
+    
+    public function getCookie($key){
+        return $this->cookies[$key];
     }
     
     /**
@@ -113,7 +135,7 @@ class Request {
      * @return boolean
      */
     public function expectsHtml(){
-        return strpos($_SERVER['HTTP_ACCEPT'], 'text/html' ) !== FALSE;
+        return strpos($this->server['HTTP_ACCEPT'], 'text/html' ) !== FALSE;
     }
     
     /**
@@ -121,6 +143,6 @@ class Request {
      * @return boolean
      */
     public function expectsJson(){
-        return strpos($_SERVER['HTTP_ACCEPT'], 'application/json' ) !== FALSE;
+        return strpos($this->server['HTTP_ACCEPT'], 'application/json' ) !== FALSE;
     }
 }

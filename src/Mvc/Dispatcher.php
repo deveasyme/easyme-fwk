@@ -47,12 +47,9 @@ class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsA
 
                         if($resp[0] instanceof ResourceInterface){
                             
-                            $this->response->setJsonContent([
-                                'total' => sizeof($resp),
-                                'itens' => array_map(function(ResourceInterface $resource){
+                            $this->response->setJsonContent(array_map(function(ResourceInterface $resource){
                                     return $resource->toArray();
-                                }, $resp)
-                            ]);
+                            }, $resp));
                             
                         }else{
                             $this->response->setJsonContent($resp);

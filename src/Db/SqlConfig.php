@@ -71,10 +71,13 @@ abstract class SqlConfig {
     }
     
     public function getPageSize() {
-        if( !is_numeric($this->pageSize) || $this->pageSize < self::MIN_PAGE_SIZE ){
+//        if( !is_numeric($this->pageSize) || $this->pageSize < self::MIN_PAGE_SIZE ){
+//            return self::MIN_PAGE_SIZE;
+//        }else if($this->pageSize > self::MAX_PAGE_SIZE){
+//            return self::MAX_PAGE_SIZE;
+//        }
+        if( !is_numeric($this->pageSize) ){
             return self::MIN_PAGE_SIZE;
-        }else if($this->pageSize > self::MAX_PAGE_SIZE){
-            return self::MAX_PAGE_SIZE;
         }
         
         return $this->pageSize;

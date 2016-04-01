@@ -63,6 +63,8 @@ class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsA
                             'total' => sizeof($resp),
                             'itens' => $itens
                         ]);
+                    }else{
+                        $this->response->setContent($resp);
                     }
                     
                     if(!$this->view->isDisabled()){

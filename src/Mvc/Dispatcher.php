@@ -63,7 +63,7 @@ class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsA
                             'total' => sizeof($resp),
                             'itens' => $itens
                         ]);
-                    }else{
+                    }else if($resp !== null){
                         $this->response->setContent($resp);
                     }
                     

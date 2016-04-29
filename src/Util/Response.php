@@ -60,7 +60,12 @@ class Response {
         return headers_sent();
     }
     public function sendContent(){
-        echo $this->responseBody;
+        
+        if($_GET['__bjson']){
+            echo "<pre>{$this->responseBody}</pre>";
+        }else{
+            echo $this->responseBody;
+        }
     }
     
     public function setStatusCode($code) {
@@ -110,7 +115,7 @@ class Response {
     }
 
     public function setJsonContent($dataArray){
-        $this->responseBody = json_encode($dataArray);
+        $this->responseBody = json_encode($dataArray, $_GET['__bjson'] ? JSON_PRETTY_PRINT : 0);
     }
     public function setXmlContent($dataArray){
         throw new \Exception('Método Response::setXmlContent() não implementado');

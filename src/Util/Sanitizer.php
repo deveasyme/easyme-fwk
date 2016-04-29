@@ -36,7 +36,7 @@ class Sanitizer {
             case "unsafe_raw": return filter_var($value,FILTER_UNSAFE_RAW);
             
             case "trim": return trim($value);
-            case "json": return $value ? json_decode($value,true) : $value;
+            case "json": return $value ? is_array($value) ? $value : json_decode($value,true) : $value;
                 
             default : {
                 if(is_callable($filter))

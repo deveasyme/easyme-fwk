@@ -74,13 +74,7 @@ class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsA
                 }
                 
             } catch (Exception $ex) {
-                
-                if(is_callable($this->onExceptionHandler)){
-                    call_user_func($this->onExceptionHandler, $ex);
-                }else{
-                    throw $ex;
-                }
-                
+                $this->handleException($ex);
             }
             
         }
@@ -130,6 +124,16 @@ class Dispatcher extends \Easyme\DI\Injectable implements \Easyme\Events\EventsA
     
     public function onException($callable){
         $this->onExceptionHandler = $callable;
+    }
+    
+    public function handleException(Exception $ex){
+        
+        if(is_callable($this->onExceptionHandler)){
+            call_user_func($this->onExceptionHandler, $ex);
+        }else{
+            throw $ex;
+        }
+
     }
     
     public function getEventManager() {

@@ -2,6 +2,8 @@
 
 namespace Easyme\Mvc;
 
+use Exception;
+use Easyme\Error\FatalErrorException;
 use Easyme\DI\Injector;
 use Easyme\DI\Injectable;
 
@@ -15,29 +17,31 @@ class Application extends Injectable{
         
         $this->router = new Router();
         
-        // Setando DI para a aplicacao
-        $that = $this;
-        
-        register_shutdown_function(function() use ($that){
-            
-            $error = error_get_last();
-                
-            if(($error['type'] === E_ERROR) || ($error['type'] === E_USER_ERROR))
-            {
-                $handler = $that->getOnShutDownHandler();
-                if(is_callable($handler)) $handler($error);
-            }
-        });
-        
     }
     
     /**
      * Executa a rota 
      */
     public function run(){
-        $route = $this->router->getRoute($this->request->getQuery('_url'));
-        $this->dispatcher->addRoute($route);
-        $this->dispatcher->start();
+        
+        register_shutdown_function(function(){
+            
+            $error = error_get_last();
+
+            if(($error['type'] === E_ERROR) || ($error['type'] === E_USER_ERROR)){
+                $this->dispatcher->handleException(new FatalErrorException($error));
+            }
+
+        });
+        
+        
+        try{
+            $route = $this->router->getRoute($this->request->getQuery('_url'));
+            $this->dispatcher->addRoute($route);
+            $this->dispatcher->start();
+        } catch (Exception $ex) {
+            $this->dispatcher->handleException($ex);
+        }
     }
     
     /**
@@ -46,14 +50,6 @@ class Application extends Injectable{
     public function flush(){
         $this->response->sendHeaders();
         $this->response->sendContent();
-    }
-    
-    public function getOnShutDownHandler() {
-        return $this->onShutDownHandler;
-    }
-
-    public function setOnShutDownHandler($onShutDownHandler) {
-        $this->onShutDownHandler = $onShutDownHandler;
     }
     
 }

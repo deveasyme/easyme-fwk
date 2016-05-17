@@ -19,7 +19,7 @@ class Sanitizer {
     const TRIM = 'trim';
     const JSON = 'json';
 
-        public function sanitize($value,$filter){
+    public function sanitize($value,$filter){
         switch($filter){
             
             case "boolean": return filter_var($value,FILTER_VALIDATE_BOOLEAN);

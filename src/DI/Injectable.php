@@ -10,7 +10,7 @@ use Easyme\Util\Response;
 use Easyme\Util\SessionStorage;
 use Easyme\Util\Logger;
 use Easyme\Util\Flash;
-use Easyme\Util\Date;
+use Easyme\Util\Sanitizer;
 
 
 /**
@@ -22,6 +22,7 @@ use Easyme\Util\Date;
  * @property SessionStorage $session
  * @property Logger $logger
  * @property Flash $flash
+ * @property Sanitizer $sanitizer
  */
 abstract class Injectable {
     
@@ -94,6 +95,10 @@ abstract class Injectable {
 
         $di->set('flash',function(){
             return new Flash();
+        },true);
+
+        $di->set('sanitizer',function(){
+            return new Sanitizer();
         },true);
         
         return $di;

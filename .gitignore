@@ -1,4 +1,6 @@
-nbproject
+inbproject
 logs
 .DS_Store
 vendor
+.idea
+nbproject

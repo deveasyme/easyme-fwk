@@ -11,7 +11,7 @@ class Application extends Injectable{
     
     private $onShutDownHandler;
     
-    private $router;
+    public $router;
     
     public function __construct() {
         

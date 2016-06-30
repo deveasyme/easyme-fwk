@@ -2,6 +2,8 @@
 
 namespace Easyme\Util;
 
+use Exception;
+
 class Response {
     
     const CONTENT_TYPE_PDF = 'application/pdf';
@@ -116,6 +118,9 @@ class Response {
 
     public function setJsonContent($dataArray){
         $this->responseBody = json_encode($dataArray, $_GET['__bjson'] ? JSON_PRETTY_PRINT : 0);
+        if($this->responseBody === FALSE){
+            throw new Exception("json_encode failed with errorn [" . json_last_error().']: ' . json_last_error_msg());
+        }
     }
     public function setXmlContent($dataArray){
         throw new \Exception('Método Response::setXmlContent() não implementado');

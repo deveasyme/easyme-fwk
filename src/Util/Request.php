@@ -41,6 +41,20 @@ class Request {
 
     }
 
+    public function setRequestData($data){
+
+        if($this->isGet()){
+            $this->getData = $data;
+        }
+        if($this->isPost()){
+            $this->postData = $data;
+        }
+        if($this->isPut()){
+            $this->putData = $data;
+        }
+
+    }
+
     public function getRawBody(){
         return $this->rawBody;
     }

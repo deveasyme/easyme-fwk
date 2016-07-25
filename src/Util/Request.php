@@ -66,7 +66,10 @@ class Request {
     private function _get($ar,$key,$filter = null,$defaultValue = null){
 
         if(array_key_exists($key, $ar)){
-            if($filter !== null) return $this->sanitizer->sanitize($ar[$key],$filter);
+
+            if( $ar[$key] === null || $ar[$key] === '') return null;
+
+            if($filter !== null ) return $this->sanitizer->sanitize($ar[$key],$filter);
             return $ar[$key];
         }
 

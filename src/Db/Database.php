@@ -11,13 +11,15 @@ use Doctrine\Common\Proxy\AbstractProxyFactory;
 class Database extends EntityManagerDecorator{
 
     public function __construct($conn = null) {
-        
+
         $config = Setup::createAnnotationMetadataConfiguration([], !EFWK_IN_PRODUCTION, EFWK_PROXIES_DIR);
-        
+
+        $config->addCustomStringFunction('COLLATE' , '\Easyme\Db\CollateFunction');
+
         if(EFWK_IN_PRODUCTION){
             $config->setAutoGenerateProxyClasses(AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS);
         }
-        
+
         $default = [
             'driver'   => 'pdo_mysql',
             'user'     => EFWK_DB_USER,
@@ -27,15 +29,15 @@ class Database extends EntityManagerDecorator{
             'charset'  => 'utf8'
         ];
         parent::__construct(EntityManager::create($conn ? array_merge($default,$conn) : $default, $config));
-        
+
     }
-    
+
     public function commit(){
         $this->getConnection()->commit();
     }
     public function rollback(){
         $this->getConnection()->rollback();
     }
-    
-    
+
+
 }

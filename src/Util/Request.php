@@ -101,7 +101,7 @@ class Request {
 
     private function _require($ar,$key,$filter = null){
 
-        if(!array_key_exists($key, $ar) || $ar[$key] === null || $ar[$key] == '')
+        if(!array_key_exists($key, $ar) || $ar[$key] === null || $ar[$key] === '')
             throw new Exception("Parâmetro '$key' obrigatório");
 
         if($filter !== null) return $this->sanitizer->sanitize($ar[$key],$filter);

@@ -48,7 +48,7 @@ class Router{
 
         foreach($parts as $i=>$part){
 
-
+            $part = ucfirst($part);
             $relPath = $i > 0 ? "$path/$part" : "";
             $absPath = EFWK_APP_DIR . $relPath;
 

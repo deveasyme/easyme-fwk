@@ -12,7 +12,15 @@ class Database extends EntityManagerDecorator{
 
     public function __construct($conn = null) {
 
-        $config = Setup::createAnnotationMetadataConfiguration([], !EFWK_IN_PRODUCTION, EFWK_PROXIES_DIR);
+        if (EFWK_IN_PRODUCTION && extension_loaded('redis')) {
+            $redis = new \Redis();
+            $redis->connect('127.0.0.1');
+            $cache = new \Doctrine\Common\Cache\RedisCache();
+            $cache->setRedis($redis);
+        }
+
+        $config = Setup::createAnnotationMetadataConfiguration([], !EFWK_IN_PRODUCTION, EFWK_PROXIES_DIR, $cache);
+
 
         $config->addCustomStringFunction('COLLATE' , '\Easyme\Db\CollateFunction');
 

@@ -13,20 +13,21 @@ class Database extends EntityManagerDecorator{
     public function __construct($conn = null) {
 
         if (EFWK_IN_PRODUCTION && extension_loaded('redis')) {
+//            die('PELO');
             $redis = new \Redis();
             $redis->connect('127.0.0.1');
+//            $redis->set('nome' , 'gustavo');
+
+//
+//            die($redis->get('nome'));
             $cache = new \Doctrine\Common\Cache\RedisCache();
             $cache->setRedis($redis);
         }
 
-        $config = Setup::createAnnotationMetadataConfiguration([], !EFWK_IN_PRODUCTION, EFWK_PROXIES_DIR, $cache);
-
+        $config = Setup::createAnnotationMetadataConfiguration([EFWK_APP_DIR], !EFWK_IN_PRODUCTION, EFWK_PROXIES_DIR, $cache);
+//        $config->entity
 
         $config->addCustomStringFunction('COLLATE' , '\Easyme\Db\CollateFunction');
-
-        if(EFWK_IN_PRODUCTION){
-            $config->setAutoGenerateProxyClasses(AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS);
-        }
 
         $default = [
             'driver'   => 'pdo_mysql',

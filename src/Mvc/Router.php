@@ -15,11 +15,52 @@ use Exception;
 
 class Router{
 
-    private $byPassList = [];
+    const CACHE_PREFIX = 'ROUTE';
 
-    public function allow($route , $parameters){
-        $this->byPassList[] = [$route,$parameters];
+    private $context;
+
+    private $cache;
+
+    /**
+     * Router constructor.
+     */
+    public function __construct()
+    {
+
+        $this->context = new RequestContext();
+        $this->context->fromRequest(SymfonyRequest::createFromGlobals());
+
+        if (EFWK_IN_PRODUCTION && extension_loaded('redis')) {
+            $this->cache = new \Redis();
+            $this->cache->connect('127.0.0.1');
+        }
     }
+
+
+    private function setCache($uri, Route $route){
+        // Ambientes de desenvolvimento
+        if(!$this->cache) return;
+
+        $this->cache->set(self::CACHE_PREFIX . $this->context->getMethod() .$uri , $route->serialize());
+    }
+
+    /**
+     * @param $uri
+     * @return Route|null
+     */
+    private function getCache($uri){
+        // Ambientes de desenvolvimento
+        if(!$this->cache) return;
+
+        $cached = $this->cache->get(self::CACHE_PREFIX . $this->context->getMethod() .$uri );
+
+        if(!$cached) return;
+
+        $route = new Route();
+        $route->unserialize($cached);
+        return $route;
+    }
+
 
     /**
      *
@@ -29,16 +70,15 @@ class Router{
      */
     public function getRoute($uri){
 
+        if($route = $this->getCache($uri)){
+            return $route;
+        }
+
+
         if(!$uri) $uri = '/';
 
         if($uri != '/'){
             $uri = preg_replace('/\/+$/', '', $uri);
-        }
-
-        foreach($this->byPassList as $allowedRoute){
-            if (preg_match($allowedRoute[0], $uri)){
-                return $this->_getRoute($allowedRoute[1]);
-            }
         }
 
         $parts = $uri == '/' ? [''] : explode('/', $uri);
@@ -48,7 +88,7 @@ class Router{
 
         foreach($parts as $i=>$part){
 
-            $part = ucfirst($part);
+
             $relPath = $i > 0 ? "$path/$part" : "";
             $absPath = EFWK_APP_DIR . $relPath;
 
@@ -62,8 +102,6 @@ class Router{
             $path .= $i > 0 ? "/$part" : $part;
         }
 
-        $context = new RequestContext();
-        $context->fromRequest(SymfonyRequest::createFromGlobals());
 
         foreach($searchDirs as $dir){
 
@@ -73,11 +111,30 @@ class Router{
                 $loader = new YamlFileLoader($locator);
                 $collection = $loader->load('routes.yml');
 
-                $matcher = new UrlMatcher($collection, $context);
+//                echo '<pre>';
+//                foreach($collection as $route){
+//                    print_r($route->serialize());
+//                }
+//                    die();
+//                $collection->
+
+                $matcher = new UrlMatcher($collection, $this->context);
 
                 $parameters = $matcher->match($uri);
+//
+//                // Adicionando na cache
+//                foreach($collection as $name => $route){
+//                    if($name == $parameters['_route']){
+//                        $symfonyRoute = $route;
+//                        break;
+//                    }
+//                }
 
-                return $this->_getRoute($parameters, $dir['namespace']);
+                $route = $this->_getRoute($parameters, $dir['namespace']);
+
+                $this->setCache($uri , $route);
+
+                return $route;
 
             } catch (Exception $ex) {
                 // Sem saida..

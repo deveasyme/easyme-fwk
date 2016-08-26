@@ -4,7 +4,9 @@ namespace Easyme\Mvc\Router;
 
 use \Easyme\Error\NotFoundException;
 
-class Route {
+
+class Route implements \Serializable{
+
 
     private $namespace;
 
@@ -19,6 +21,47 @@ class Route {
      * @var string
      */
     private $ccuPath;
+
+    /**
+     * String representation of object
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     * @since 5.1.0
+     */
+    public function serialize()
+    {
+        return serialize([
+            'namespace' => $this->getNamespace(),
+            'ccu' => $this->getCcu(),
+            'params' => $this->getParams(),
+            'action' => $this->getAction()
+        ]);
+    }
+
+    /**
+     * Constructs the object
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     * The string representation of the object.
+     * </p>
+     * @return void
+     * @since 5.1.0
+     */
+    public function unserialize($serialized)
+    {
+        $data = unserialize($serialized);
+
+        $this->namespace = $data['namespace'];
+        $this->ccu = $data['ccu'];
+
+        if(isset($data['params'])){
+            $this->params = $data['params'];
+        }
+        if(isset($data['action'])) {
+            $this->action = $data['action'];
+        }
+    }
+
 
     public function getNamespace() {
         return $this->namespace;
@@ -109,125 +152,7 @@ class Route {
         return $this->ccuPath;
     }
 
-//    public function getNamespace() {
-//        return $this->namespace;
-//    }
-//
-//    public function getCcuName() {
-//        return $this->ccuName;
-//    }
-//    public function getCcuFullName() {
-//        $ccuName = '\\Ccu\\';
-//        if($ns = $this->getNamespace()){
-//            $ccuName .= ucfirst($ns)."\\";
-//        }
-//        $ccuName .= ucfirst($this->getCcuName()) . 'Ccu';
-//        return $ccuName;
-//    }
-//
-//    public function getAction() {
-//        return $this->action;
-//    }
-//
-//    public function getParams() {
-//        return $this->params;
-//    }
-//
-//    public function setNamespace($namespace) {
-//        $this->namespace = $namespace;
-//    }
-//
-//    public function setCcuName($ccuName) {
-//        $this->ccuName = $ccuName;
-//    }
-//
-//    public function setAction($action) {
-//        $this->action = $action;
-//    }
-//
-//    public function setParams($params) {
-//        $this->params = $params;
-//    }
-//
-//    private function _assembly(){
-//
-//        if(!$this->_ccu){
-//
-//            $ccuName = $this->getCcuFullName();
-//
-//            if(!class_exists($ccuName)){
-//                throw new \Exception("Class '$ccuName' not found");
-//            }
-//
-//            $this->_ccu = new $ccuName;
-//
-//            $action = $this->getAction();
-//
-//            $isRestCall = $this->_ccu instanceof \Easyme\Mvc\CcuRest;
-//
-//            if($isRestCall){
-//                if($action == 'index') $action = '';
-//
-//                $action = ucfirst($action);
-//                $method = strtolower($this->request->getMethod());
-//                $actionName = $method .$action. 'Action';
-//
-//                $this->setAction($method.$action);
-//            }else{
-//
-//                $actionName = $action.'Action';
-//            }
-//
-//
-//
-//            /*O metodo nao existe*/
-//            if(!method_exists($ccuName, $actionName)){
-//                throw new \Exception("Method '$actionName' not found in '$ccuName'");
-//            }
-//
-////            if( !$isRestCall ){
-//
-//                $reflection = new \ReflectionMethod ($ccuName, $actionName);
-//                $params = $reflection->getParameters();
-//                $paramsObg = array_filter($params,function($arg){
-//                    return !$arg->isOptional();
-//                });
-//
-//                if( ! (sizeof($this->getParams()) == sizeof($params) || ( (sizeof($this->getParams()) >= sizeof($paramsObg)) && (sizeof($params) > 0) ) )){
-//                    throw new \Exception("Method '$actionName' not found in '$ccuName'");
-//                }
-////            }
-//
-//
-//        }
-//
-//        return true;
-//    }
-//
-//    public function run(){
-//        $this->_assembly();
-//        /*Tenta chamar metodo inicializador da classe*/
-//        if(method_exists($this->_ccu,'init')) $this->_ccu->init();
-//
-//        if( $this->_ccu instanceof \Easyme\Mvc\CcuRest ){
-//            return call_user_method_array('_dispatch', $this->_ccu,array($this->getAction().'Action',$this->getParams()));
-//        }else{
-//            return call_user_method_array($this->getAction().'Action', $this->_ccu, $this->getParams());
-//        }
-//    }
-//
-//    public function exists(){
-//
-//        try{
-//            return $this->test();
-//        } catch (\Exception $ex) {
-////            echo $ex->getMessage();
-//            return false;
-//        }
-//    }
-//    public function test(){
-//        return $this->_assembly();
-//    }
+
 
 
 }

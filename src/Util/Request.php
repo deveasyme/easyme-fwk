@@ -3,43 +3,71 @@
 namespace Easyme\Util;
 
 use Exception;
+use \Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class Request {
 
-    private $server;
+    /**
+     * @var SymfonyRequest
+     */
     private $request;
+
+    private $server;
+////    private $request;
     private $cookies;
     private $sanitizer;
-
-    private $files;
-
-    private $rawBody;
-
+//
+//    private $files;
+//
+//    private $rawBody;
+//
     private $getData  = array();
     private $postData = array();
     private $putData  = array();
 
     public function __construct() {
+
+        $this->request = SymfonyRequest::createFromGlobals();
+
+
         $this->server = $_SERVER;
-        $this->request = $_REQUEST;
+//        $this->request = $_REQUEST;
         $this->cookies = $_COOKIE;
-        $this->files = $_FILES;
+//        $this->files = $_FILES;
+
         $this->sanitizer = new Sanitizer();
 
-//        if(isset($_SERVER["CONTENT_TYPE"]) && ) {
-//            $this->postData =
-//        }
 
-        $this->rawBody = trim(file_get_contents('php://input'));
+//        $this->rawBody = trim(file_get_contents('php://input'));
+        $this->rawBody = $this->request->getContent();
 
         $this->getData = $_GET;
         if($this->isPost()){
+//            $this->postData = $this->request->getContent();
             $this->postData = array_merge($_POST, $this->getJsonRawBody());
         }else if($this->isPut()){
             $this->putData = $this->getJsonRawBody();
         }
 
     }
+
+    /**
+     * @return SymfonyRequest
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
+     * @param SymfonyRequest $request
+     */
+    public function setRequest($request)
+    {
+        $this->request = $request;
+    }
+
+
 
     public function setRequestData($data){
 
@@ -143,26 +171,26 @@ class Request {
         return $url;
     }
 
-    public function getMethod(){
-        return $this->server['REQUEST_METHOD'];
-    }
-    public function isMethod($method){
-        return $this->getMethod() == $method;
-    }
+//    public function getMethod(){
+//        return $this->server['REQUEST_METHOD'];
+//    }
+//    public function isMethod($method){
+//        return $this->getMethod() == $method;
+//    }
     public function isGet(){
-        return $this->isMethod('GET');
+        return $this->request->isMethod('GET');
     }
 
     public function isPost(){
-        return $this->isMethod('POST');
+        return $this->request->isMethod('POST');
     }
 
     public function isPut(){
-        return $this->isMethod('PUT');
+        return $this->request->isMethod('PUT');
     }
 
     public function isDelete(){
-        return $this->isMethod('DELETE');
+        return $this->request->isMethod('DELETE');
     }
 
     public function getReferer(){
@@ -196,6 +224,8 @@ class Request {
      * @return boolean
      */
     public function expectsJson(){
+//        print_r($this->request->getAcceptableContentTypes());
+//        die();
         return strpos($this->server['HTTP_ACCEPT'], 'application/json' ) !== FALSE;
     }
 }

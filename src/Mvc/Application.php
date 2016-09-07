@@ -8,24 +8,24 @@ use Easyme\DI\Injector;
 use Easyme\DI\Injectable;
 
 class Application extends Injectable{
-    
+
     private $onShutDownHandler;
-    
+
     public $router;
-    
+
     public function __construct() {
-        
-        $this->router = new Router();
-        
+
+        $this->router = new Router( $this->getDi()->get('request') );
+
     }
-    
+
     /**
-     * Executa a rota 
+     * Executa a rota
      */
     public function run(){
-        
+
         register_shutdown_function(function(){
-            
+
             $error = error_get_last();
 
             if(($error['type'] === E_ERROR) || ($error['type'] === E_USER_ERROR)){
@@ -33,8 +33,8 @@ class Application extends Injectable{
             }
 
         });
-        
-        
+
+
         try{
             $route = $this->router->getRoute($this->request->getQuery('_url'));
             $this->dispatcher->addRoute($route);
@@ -43,13 +43,13 @@ class Application extends Injectable{
             $this->dispatcher->handleException($ex);
         }
     }
-    
+
     /**
-     * Imprime as saidas (cabecalho + corpo) 
+     * Imprime as saidas (cabecalho + corpo)
      */
     public function flush(){
         $this->response->sendHeaders();
         $this->response->sendContent();
     }
-    
+
 }

@@ -3,6 +3,7 @@
 
 namespace Easyme\Mvc;
 
+use Easyme\Util\Request;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\RequestContext;
@@ -24,11 +25,11 @@ class Router{
     /**
      * Router constructor.
      */
-    public function __construct()
+    public function __construct(Request $request)
     {
 
         $this->context = new RequestContext();
-        $this->context->fromRequest(SymfonyRequest::createFromGlobals());
+        $this->context->fromRequest($request->getRequest());
 
         if (EFWK_IN_PRODUCTION && extension_loaded('redis')) {
             $this->cache = new \Redis();

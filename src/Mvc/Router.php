@@ -163,7 +163,7 @@ class Router{
         // A proxima, eh sempre o nome da ccu
         $route->setCcu(array_pop($ccu));
 
-        $route->setNamespace(  $namespace . '/' . implode('/', $ccu) );
+        $route->setNamespace(  $namespace . '/' . implode('/', array_map('ucfirst',$ccu)) );
 
         foreach($parameters as $k=>$v){
             if($k[0] != '_'){

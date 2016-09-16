@@ -19,9 +19,12 @@ class Dao extends Injectable{
         self::$inTransaction = true;
     }
     public function commit(){
-        $this->db->flush();
-        $this->db->getConnection()->commit();
-        self::$inTransaction = false;
+
+        if($this->db->canFlush()) {
+            $this->db->flush();
+            $this->db->getConnection()->commit();
+            self::$inTransaction = false;
+        }
     }
     public function rollback(){
         $this->db->getConnection()->rollBack();

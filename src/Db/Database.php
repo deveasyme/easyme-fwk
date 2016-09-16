@@ -10,6 +10,8 @@ use Doctrine\Common\Proxy\AbstractProxyFactory;
 
 class Database extends EntityManagerDecorator{
 
+    private $canFlush = true;
+
     public function __construct($conn = null) {
 
         if (EFWK_IN_PRODUCTION && extension_loaded('redis')) {
@@ -47,6 +49,14 @@ class Database extends EntityManagerDecorator{
     public function rollback(){
         $this->getConnection()->rollback();
     }
-
+    public function enableFlush(){
+        $this->canFlush = true;
+    }
+    public function disableFlush(){
+        $this->canFlush = false;
+    }
+    public function canFlush(){
+        return $this->canFlush;
+    }
 
 }

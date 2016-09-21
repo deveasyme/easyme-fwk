@@ -133,6 +133,7 @@ class Router{
 
                 $route = $this->_getRoute($parameters, $dir['namespace']);
 
+
                 $this->setCache($uri , $route);
 
                 return $route;
@@ -154,6 +155,15 @@ class Router{
      */
     private function _getRoute($parameters , $namespace = ''){
 
+        if(array_key_exists('_subdomain' , $parameters)){
+            $subdomains = preg_split("/\s*\|\s*/",$parameters['_subdomain']);
+            $subdomain = explode('.',$this->context->getHost())[0];
+
+            if(!in_array($subdomain , $subdomains)){
+                throw new Exception("Rota indisponível para subdominio $subdomain");
+            }
+        }
+
         $route = new Route();
 
         $ccu = explode(":", $parameters['_ccu']);
@@ -163,7 +173,7 @@ class Router{
         // A proxima, eh sempre o nome da ccu
         $route->setCcu(array_pop($ccu));
 
-        $route->setNamespace(  $namespace . '/' . implode('/', array_map('ucfirst',$ccu)) );
+        $route->setNamespace(  $namespace . '/' . implode('/', $ccu) );
 
         foreach($parameters as $k=>$v){
             if($k[0] != '_'){

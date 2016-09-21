@@ -211,6 +211,10 @@ class Request {
         return $this->cookies[$key];
     }
 
+    public function getSubdomain(){
+        return explode('.',$this->request->getHost())[0];
+    }
+
     /**
      * Se a requisicao espera como retorno html
      * @return boolean

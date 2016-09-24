@@ -30,6 +30,7 @@ class Application extends Injectable{
 
             if(($error['type'] === E_ERROR) || ($error['type'] === E_USER_ERROR)){
                 $this->dispatcher->handleException(new FatalErrorException($error));
+                $this->flush();
             }
 
         });

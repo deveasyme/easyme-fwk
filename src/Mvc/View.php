@@ -8,8 +8,9 @@ use \Easyme\DI\Injectable;
 
 class View extends Injectable{
 
-    private static $TEMPLATE_DIR = '_templates';
-    private static $PARTIALS_DIR = '_partials';
+    private static $TEMPLATE_DIR = 'templates';
+    private static $CONTENTS_DIR = 'contents';
+    private static $PARTIALS_DIR = 'partials';
 
     private $vars = array();
 
@@ -29,7 +30,7 @@ class View extends Injectable{
 
     public function setTemplate($filename){
 
-        $path = EFWK_APP_DIR.'/'.self::$TEMPLATE_DIR.'/'.$filename.'.php';
+        $path = EFWK_VIEW_DIR.'/'.self::$TEMPLATE_DIR.'/'.$filename.'.php';
 
         if(!file_exists($path)){
             throw new Exception("Template $filename not found");
@@ -48,7 +49,7 @@ class View extends Injectable{
             $path = EFWK_PUBLIC_DIR.'/'.$filename;
         }else{
 
-            $path = EFWK_APP_DIR.'/'.$this->dispatcher->getRoute()->getCcuPath().'/'.$filename.'.php';
+            $path = EFWK_VIEW_DIR.'/'.self::$CONTENTS_DIR.'/'.$filename.'.php';
         }
 
 
@@ -103,7 +104,7 @@ class View extends Injectable{
      */
     public function partial($name,array $vars = array()){
 
-        $file = EFWK_APP_DIR.'/'.self::$PARTIALS_DIR.'/'.$name.'.php';
+        $file = EFWK_VIEW_DIR.'/'.self::$PARTIALS_DIR.'/'.$name.'.php';
 
         if(!file_exists($file))
             throw new Exception("Partial {$name} not found");

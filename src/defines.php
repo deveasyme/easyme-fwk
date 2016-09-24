@@ -15,6 +15,8 @@ define('EFWK_UPLOADS_DIR',EFWK_ROOT_DIR.'/uploads');
 
 define('EFWK_APP_DIR',EFWK_ROOT_DIR.'/server');
 
+define('EFWK_VIEW_DIR',EFWK_APP_DIR.'/_view');
+
 define('EFWK_PUBLIC_DIR',EFWK_ROOT_DIR.'/public');
 
 $ini = parse_ini_file(EFWK_CONFIG_DIR.'/app.ini',true);

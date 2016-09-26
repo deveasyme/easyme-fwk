@@ -10,7 +10,7 @@ use Doctrine\Common\Proxy\AbstractProxyFactory;
 
 class Database extends EntityManagerDecorator{
 
-    public function __construct($conn = null) {
+    public function __construct($conn = null, $paths = [EFWK_APP_DIR]) {
 
         if (EFWK_IN_PRODUCTION && extension_loaded('redis')) {
 //            die('PELO');
@@ -24,7 +24,7 @@ class Database extends EntityManagerDecorator{
             $cache->setRedis($redis);
         }
 
-        $config = Setup::createAnnotationMetadataConfiguration([EFWK_APP_DIR], !EFWK_IN_PRODUCTION, EFWK_PROXIES_DIR, $cache);
+        $config = Setup::createAnnotationMetadataConfiguration($paths, !EFWK_IN_PRODUCTION, EFWK_PROXIES_DIR, $cache);
 //        $config->entity
 
         $config->addCustomStringFunction('COLLATE' , '\Easyme\Db\CollateFunction');
